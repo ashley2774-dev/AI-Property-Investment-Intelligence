@@ -26,7 +26,7 @@ A truly perfect label would require future outcomes such as:
 
 That kind of data is usually unavailable at the start of a project.
 
-To solve this, I am using the financial engine from Day 2 to generate decision-oriented labels based on the metrics an investor would use during screening.
+To solve this, I am using the financial engine from financial logic to generate decision-oriented labels based on the metrics an investor would use during screening.
 
 This allows me to:
 - create a consistent target variable
