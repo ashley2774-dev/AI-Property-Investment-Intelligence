@@ -1,4 +1,0 @@
-streamlit>=1.44
-pandas>=2.2
-numpy>=1.26
-joblib>=1.3
