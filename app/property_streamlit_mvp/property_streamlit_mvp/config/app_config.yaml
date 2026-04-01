@@ -1,7 +1,0 @@
-app_name: Property Investment Screener
-currency: ZAR
-screening_thresholds:
-  min_dscr: 1.25
-  min_gross_yield: 0.09
-  min_roi: 0.08
-  max_bond_to_rent: 0.75
