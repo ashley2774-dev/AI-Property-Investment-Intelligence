@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.inference.features import build_features
-from src.inference.model import RuleBasedModel
+from .features import build_features
+from .model import RuleBasedModel
 
 MODEL = RuleBasedModel()
 
