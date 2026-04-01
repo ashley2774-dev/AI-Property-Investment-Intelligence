@@ -1,0 +1,197 @@
+suburb,avg_rent,median_rent,listings
+Alveda,8000.0,8000.0,1
+Atholl,6430.0,6160.0,3
+Auckland Park,6080.0,6000.0,5
+Barbeque Downs,15500.0,12500.0,5
+Bedford Gardens,15500.0,15500.0,2
+Bedfordview,21976.0,24000.0,31
+Benmore Gardens,56083.0,75000.0,6
+Berea,4220.0,4290.0,7
+Beverley,19606.0,14425.0,8
+Bezuidenhout Valley,6592.0,6850.0,6
+Blackheath,8750.0,8750.0,2
+Blairgowrie,18583.0,16750.0,6
+Blue Hills,20914.0,25000.0,7
+Bordeaux,30000.0,30000.0,1
+Boskruin,13000.0,13000.0,1
+Braamfontein,5542.0,5825.0,12
+Bram Fisherville,2500.0,2500.0,1
+Bramley,10037.0,6565.0,10
+Bramley Park,12500.0,12500.0,1
+Bramley View,10000.0,10000.0,1
+Brixton,3933.0,3500.0,3
+Broadacres,18900.0,17000.0,10
+Bromhof,6500.0,6500.0,1
+Bruma,5100.0,5100.0,1
+Bryanston,27873.0,21000.0,31
+Buccleuch,6375.0,6375.0,2
+Carlswald,10050.0,8600.0,4
+Carlswald Estate,11671.0,9600.0,12
+Carlswald North Estate,7400.0,7400.0,1
+Cedar Creek,35000.0,35000.0,1
+Cedar Lakes,47500.0,47500.0,1
+Chartwell,18860.0,19500.0,5
+Chiawelo,6000.0,6000.0,1
+City And Suburban Maboneng,4480.0,4635.0,4
+Clayville,10779.0,8000.0,12
+Corlett Gardens,6250.0,6250.0,2
+Coronationville,6650.0,6650.0,1
+Cosmo City,6750.0,6500.0,6
+Country View,8175.0,8950.0,4
+Craigavon,21857.0,21000.0,7
+Craighall,11000.0,11000.0,2
+Craighall Park,18667.0,23000.0,3
+Crown Gardens,12000.0,12000.0,1
+Crowthorne,11500.0,9000.0,3
+Cyrildene,16000.0,16000.0,1
+Dainfern,42143.0,42000.0,35
+Dainfern Ridge,35000.0,35000.0,4
+Dainfern Valley,54500.0,55000.0,8
+Douglasdale,9425.0,7950.0,4
+Ebony Park,4750.0,5000.0,4
+Edenburg,12500.0,12500.0,1
+Emmarentia,20000.0,20000.0,1
+Erand Gardens,7600.0,6500.0,4
+Eye Of Africa,13575.0,13575.0,2
+Fairland,9550.0,9550.0,2
+Ferndale,10869.0,7450.0,25
+Florida Glen,22000.0,22000.0,1
+Fontainebleau,8000.0,8000.0,1
+Forest Hill,5400.0,5500.0,3
+Fourways,24286.0,25000.0,28
+Fourways Gardens,56000.0,50000.0,5
+Gallo Manor,39000.0,39000.0,1
+Gillview,12500.0,12500.0,1
+Glen Austin,7433.0,6550.0,6
+Glenhazel,18000.0,18000.0,1
+Glenvista,23250.0,23250.0,2
+Grand Central,8980.0,7600.0,5
+Greenside,15750.0,15750.0,2
+Haddon,3700.0,3700.0,1
+Halfway Gardens,14445.0,13000.0,11
+Halfway House,15283.0,8950.0,3
+Helderfontein Estate,70000.0,67500.0,4
+Highlands North,14000.0,14000.0,1
+Hillbrow,4390.0,4635.0,4
+Houghton Estate,43417.0,47500.0,6
+Hurlingham,50000.0,55000.0,3
+Hurlingham Manor,35375.0,30750.0,4
+Hyde Park,62818.0,52500.0,22
+Illovo,8625.0,8825.0,8
+Jabulani,4650.0,4650.0,1
+Jackal Creek Northriding,14500.0,18000.0,3
+Jeppestown,4315.0,4200.0,3
+Johannesburg Cbd,4086.0,3700.0,28
+Johannesburg North,18500.0,18500.0,1
+Jukskei Park,16583.0,15750.0,6
+Jukskei View,12333.0,15000.0,3
+Kelvin,22807.0,25000.0,7
+Kengies,19000.0,19000.0,2
+Kensington,10671.0,11000.0,12
+Kensington B,6400.0,6400.0,1
+Kibler Park,12650.0,9100.0,8
+Killarney,13500.0,13500.0,1
+Kya Sands,7100.0,7100.0,2
+Kyalami,19018.0,15200.0,17
+Kyalami Ah,17842.0,16500.0,12
+Kyalami Estate,43750.0,43750.0,2
+Kyalami Hills,14833.0,13000.0,3
+Lanseria And Surrounds,11100.0,14000.0,3
+Lawley,4500.0,4500.0,1
+Lenasia,5250.0,5250.0,2
+Linbro Park,11190.0,12250.0,5
+Linden,15800.0,15800.0,2
+Linksfield,43625.0,40000.0,4
+Linmeyer,11500.0,11500.0,1
+Lombardy East,12100.0,12000.0,3
+Lonehill,23967.0,21500.0,12
+Lyndhurst,13250.0,13250.0,2
+Magaliessig,25000.0,25000.0,1
+Malanshof,14000.0,14000.0,1
+Maroeladal,36000.0,36000.0,1
+Marshalltown,4630.0,4700.0,19
+Meadowlands,6500.0,6500.0,1
+Melrose Arch,37000.0,37000.0,1
+Melrose North,36000.0,36000.0,1
+Melville,12903.0,14245.0,6
+Meredale,7200.0,7200.0,1
+Mondeor,13840.0,13400.0,5
+Montgomery Park,10350.0,10350.0,2
+Morninghill,17950.0,17950.0,2
+Morningside,35453.0,25500.0,32
+Mulbarton,11200.0,11200.0,1
+Naturena,10167.0,6500.0,3
+New Doornfontein,2950.0,2950.0,2
+Nooitgedacht,25000.0,25000.0,1
+Noordhang,9500.0,9500.0,1
+Noordwyk,11118.0,9500.0,31
+Norscot,11500.0,11500.0,1
+North Riding,14643.0,8990.0,13
+Northcliff,10483.0,12000.0,3
+Northgate,10600.0,9000.0,3
+Northwold,8500.0,8500.0,1
+Norwood,12500.0,12500.0,2
+Oakdene,5300.0,5300.0,1
+Oaklands,8557.0,8590.0,3
+Observatory,6250.0,6250.0,2
+Olifantsfontein,36000.0,48000.0,3
+Olivedale,25050.0,28000.0,5
+Orlando,2200.0,2200.0,1
+Ormonde,9745.0,8500.0,11
+Parkhurst,26500.0,26500.0,2
+Parkmore,26204.0,29500.0,13
+Parktown,7190.0,7190.0,1
+Parktown North,7500.0,7500.0,1
+Parkview,21500.0,21500.0,2
+Paulshof,14400.0,8000.0,7
+Pimville,6114.0,6700.0,7
+Pineslopes,9300.0,9300.0,1
+Protea Glen,4962.0,5000.0,13
+Protea North,3000.0,3000.0,1
+Quellerina,20000.0,20000.0,2
+Randpark,20500.0,20500.0,1
+Randpark Ridge,15167.0,17000.0,3
+Rembrandt Park,6160.0,6000.0,3
+Ridgeway,25000.0,25000.0,1
+River Club,35000.0,35000.0,1
+Riverlea,10000.0,10000.0,1
+Riverside View,8000.0,8000.0,1
+Rivonia,17036.0,10322.0,4
+Robertsham,8100.0,8100.0,2
+Robin Hills,21000.0,21000.0,1
+Roosevelt Park,13849.0,13849.0,2
+Rosebank,18571.0,20000.0,12
+Rosettenville,4648.0,4495.0,4
+Sagewood,7467.0,7500.0,3
+Sandhurst,93375.0,75000.0,4
+Sandown,26631.0,18000.0,15
+Sandringham,23000.0,24000.0,3
+Sandton Central,25917.0,19750.0,6
+Savoy Estate,23625.0,21500.0,4
+Sharonlea,24500.0,24500.0,1
+South Hills,6800.0,6800.0,2
+Soweto Central,4300.0,4800.0,3
+St Andrews,36667.0,35000.0,3
+Steyn City,120000.0,120000.0,1
+Strathavon,7482.0,7390.0,5
+Suideroord,14125.0,13250.0,4
+Summerset,13487.0,12500.0,4
+Sundowner,22750.0,22750.0,2
+Sunninghill,9346.0,7640.0,21
+Sydenham,15000.0,15000.0,3
+The Hill,5033.0,4600.0,3
+Turffontein,6250.0,6250.0,2
+Victory Park,18000.0,18000.0,1
+Vorna Valley,8911.0,8250.0,6
+Waterfall Country Village,63333.0,67000.0,3
+Waterfall Estate,29515.0,22000.0,27
+Waverley,13900.0,13900.0,2
+Wendywood,24500.0,24500.0,2
+Westbury,6000.0,6000.0,1
+Westdene,9001.0,7400.0,11
+Whiteridge,12500.0,12500.0,1
+Willaway,27000.0,27000.0,1
+Winchester Hills,8750.0,8750.0,2
+Windsor West,6300.0,6300.0,1
+Woodmead,25550.0,29450.0,8
+Yeoville,5250.0,5250.0,2
