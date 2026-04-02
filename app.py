@@ -174,10 +174,6 @@ def _single_property_form():
     }
 
 
-def _confidence_display(result: dict) -> str:
-    return _fmt_pct(result.get("top_probability_pct", 0))
-
-
 def _render_amortization_table(schedule: pd.DataFrame):
     st.markdown("**Projection snapshot**")
     projection_cols = ["year", "property_value", "loan_balance", "equity"]
@@ -191,24 +187,6 @@ def _render_amortization_table(schedule: pd.DataFrame):
         st.dataframe(display_df.astype(str), use_container_width=True, hide_index=True)
     else:
         st.dataframe(schedule.astype(str), use_container_width=True, hide_index=True)
-
-
-def _build_probability_table(scored: pd.DataFrame) -> pd.DataFrame:
-    prob_cols = [c for c in scored.columns if c.startswith("prob_")]
-    if not prob_cols:
-        return pd.DataFrame()
-
-    prob_display = (
-        scored[prob_cols]
-        .rename(columns=lambda x: x.replace("prob_", "").title())
-        .T
-        .reset_index()
-        .rename(columns={"index": "Class", 0: "Probability (%)"})
-    )
-    prob_display["Probability (%)"] = prob_display["Probability (%)"].astype(float).round(2)
-    prob_display = prob_display.sort_values("Probability (%)", ascending=False).reset_index(drop=True)
-    prob_display["Probability (%)"] = prob_display["Probability (%)"].map(lambda x: f"{x:.2f}%")
-    return prob_display
 
 
 def _financial_recommendation(result: dict) -> str:
@@ -233,15 +211,15 @@ def main():
         "threshold policy, and notebook artifacts from your modelling workflow."
     )
     st.sidebar.info(
-        "Upload the model artifacts into the repo root under /models and optional reports under /reports. "
-        "The app will then score deals with the real pipeline instead of the earlier rule-based stand-in."
+        "This tool is designed for first-pass investment screening. "
+        "Use it to assess likely deal quality, unit economics, and projected equity growth."
     )
 
     _render_artifact_warning()
     runtime = get_runtime()
 
     tabs = st.tabs(
-        ["Summary", "Financials", "Amortization & equity", "Batch scoring", "Artifacts"]
+        ["Summary", "Financials", "Amortization & equity", "Batch scoring"]
     )
 
     with tabs[0]:
@@ -261,21 +239,10 @@ def main():
 
             flag_pack = generate_flags(result)
 
-            c1, c2, c3, c4, c5 = st.columns(5)
+            c1, c2, c3 = st.columns(3)
             c1.metric("Investor recommendation", financial_label)
-            c2.metric("Model default label", str(result.get("predicted_label_default", "unknown")).title())
-            c3.metric("Threshold label", str(result.get("predicted_label_threshold", "unknown")).title())
-            c4.metric("Confidence", _confidence_display(result))
-            c5.metric("Monthly cash flow", _fmt_money(result.get("monthly_cash_flow", 0)))
-
-            c6, c7 = st.columns(2)
-            c6.metric("Recommended label", str(result.get("recommended_label", "unknown")).title())
-            c7.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
-
-            st.subheader("Probability breakdown")
-            prob_display = _build_probability_table(scored)
-            if not prob_display.empty:
-                st.dataframe(prob_display.astype(str), use_container_width=True, hide_index=True)
+            c2.metric("Monthly cash flow", _fmt_money(result.get("monthly_cash_flow", 0)))
+            c3.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
 
             st.subheader("Green flags")
             if flag_pack.get("green_flags"):
@@ -291,13 +258,8 @@ def main():
             else:
                 st.write("No major red flags identified from the current inputs.")
 
-            st.subheader("Model-ready preview")
-            st.dataframe(scored.astype(str), use_container_width=True)
-
             st.session_state["latest_result"] = result
             st.session_state["latest_input"] = user_input
-            st.session_state["latest_scored"] = scored
-            st.session_state["latest_model_df"] = model_df
 
     with tabs[1]:
         st.subheader("Financials")
@@ -378,7 +340,7 @@ def main():
         st.subheader("Batch scoring")
         st.write(
             "Upload a CSV using the provided template. The app will calculate financial features, "
-            "align the frame to the training feature list, and score each property with the real model."
+            "align the frame to the training feature list, and score each property."
         )
 
         template_path = Path("sample_batch_input.csv")
@@ -406,43 +368,6 @@ def main():
                 file_name="investment_scored_results.csv",
                 mime="text/csv",
             )
-
-    with tabs[4]:
-        st.subheader("Loaded artifacts")
-        manifest = {
-            "model_path": str(runtime["paths"]["model"]),
-            "feature_list_path": str(runtime["paths"]["features"]),
-            "label_encoder_path": str(runtime["paths"]["label_encoder"]),
-            "threshold_config_path": str(runtime["paths"]["threshold_config"]),
-        }
-        st.json(manifest)
-
-        st.markdown("**Live inference diagnostics**")
-        st.write("Model classes:", list(runtime["label_encoder"].classes_))
-
-        if "latest_model_df" in st.session_state:
-            latest_model_df = st.session_state["latest_model_df"]
-            st.write("Model input shape:", latest_model_df.shape)
-            st.write("Model input non-null count:", int(latest_model_df.notna().sum(axis=1).iloc[0]))
-            non_null_cols = latest_model_df.columns[latest_model_df.notna().iloc[0]].tolist()
-            st.write("First 30 non-null columns:", non_null_cols[:30])
-
-        if "latest_scored" in st.session_state:
-            latest_scored = st.session_state["latest_scored"]
-            prob_cols = [c for c in latest_scored.columns if c.startswith("prob_")]
-            if prob_cols:
-                st.markdown("**Raw model probabilities**")
-                st.dataframe(latest_scored[prob_cols].astype(str), use_container_width=True)
-
-        optional_reports = [
-            Path("reports/metrics/final_model_metrics_summary.csv"),
-            Path("reports/features/final_model_feature_importance.csv"),
-            Path("reports/explainability/shap_global_importance.csv"),
-        ]
-        for report_path in optional_reports:
-            if report_path.exists():
-                st.write(f"Preview: {report_path}")
-                st.dataframe(pd.read_csv(report_path).head(20).astype(str), use_container_width=True)
 
 
 if __name__ == "__main__":
