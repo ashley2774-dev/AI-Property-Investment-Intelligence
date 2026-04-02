@@ -15,13 +15,6 @@ st.set_page_config(
     layout="wide",
 )
 
-ARTIFACTS = {
-    "model": "models/investment_model_pipeline.joblib",
-    "features": "models/model_features.joblib",
-    "label_encoder": "models/label_encoder.joblib",
-    "threshold_config": "models/threshold_config.json",
-}
-
 
 @st.cache_resource(show_spinner=False)
 def get_runtime():
@@ -203,6 +196,19 @@ def _confidence_display(result: dict) -> str:
     return _fmt_pct(confidence_value)
 
 
+def _merge_without_duplicate_columns(left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
+    left = left.reset_index(drop=True).copy()
+    right = right.reset_index(drop=True).copy()
+
+    overlapping = [col for col in right.columns if col in left.columns]
+    if overlapping:
+        right = right.drop(columns=overlapping)
+
+    merged = pd.concat([left, right], axis=1)
+    merged = merged.loc[:, ~merged.columns.duplicated()].copy()
+    return merged
+
+
 def _render_amortization_table(schedule: pd.DataFrame):
     st.markdown("**Projection snapshot**")
     projection_cols = ["year", "property_value", "loan_balance", "equity"]
@@ -245,14 +251,7 @@ def main():
             property_df = build_single_property_features(user_input, runtime["feature_names"])
             scored = score_properties(property_df, runtime)
 
-            full_result_df = pd.concat(
-                [
-                    property_df.reset_index(drop=True),
-                    scored.reset_index(drop=True),
-                ],
-                axis=1,
-            )
-
+            full_result_df = _merge_without_duplicate_columns(property_df, scored)
             result = full_result_df.iloc[0].to_dict()
             result = _normalize_result_fields(result)
 
@@ -293,7 +292,7 @@ def main():
                 st.write("No major red flags identified from the current inputs.")
 
             st.subheader("Model-ready preview")
-            st.dataframe(full_result_df, use_container_width=True)
+            st.dataframe(full_result_df.astype(str), use_container_width=True)
 
             st.session_state["latest_result"] = result
             st.session_state["latest_input"] = user_input
@@ -366,7 +365,7 @@ def main():
             for col in ["property_value", "loan_balance", "equity"]:
                 if col in schedule_display.columns:
                     schedule_display[col] = schedule_display[col].astype(float).map(_fmt_money)
-            st.dataframe(schedule_display, use_container_width=True, hide_index=True)
+            st.dataframe(schedule_display.astype(str), use_container_width=True, hide_index=True)
 
     with tabs[3]:
         st.subheader("Batch scoring")
@@ -390,7 +389,8 @@ def main():
             batch_df = pd.read_csv(uploaded)
             prepared = coerce_batch_input(batch_df, runtime["feature_names"])
             scored_batch = score_properties(prepared, runtime)
-            st.dataframe(scored_batch, use_container_width=True)
+            scored_batch = scored_batch.loc[:, ~scored_batch.columns.duplicated()].copy()
+            st.dataframe(scored_batch.astype(str), use_container_width=True)
             st.download_button(
                 "Download scored results",
                 data=scored_batch.to_csv(index=False).encode("utf-8"),
@@ -416,7 +416,7 @@ def main():
         for report_path in optional_reports:
             if report_path.exists():
                 st.write(f"Preview: {report_path}")
-                st.dataframe(pd.read_csv(report_path).head(20), use_container_width=True)
+                st.dataframe(pd.read_csv(report_path).head(20).astype(str), use_container_width=True)
 
 
 if __name__ == "__main__":
