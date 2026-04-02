@@ -4,46 +4,6 @@ import numpy as np
 import pandas as pd
 
 
-BUSINESS_COLUMNS = [
-    "province",
-    "city",
-    "suburb",
-    "property_type",
-    "bedrooms",
-    "bathrooms",
-    "parking",
-    "purchase_price",
-    "estimated_rent",
-    "floor_area_sqm",
-    "levy",
-    "rates_taxes",
-    "insurance",
-    "other_opex",
-    "deposit_pct",
-    "interest_rate_pct",
-    "loan_term_years",
-    "vacancy_pct",
-    "management_fee_pct",
-    "maintenance_pct",
-    "annual_growth_pct",
-    "deposit_amount",
-    "loan_amount",
-    "monthly_bond_payment",
-    "monthly_vacancy_cost",
-    "monthly_management_fee",
-    "monthly_maintenance_cost",
-    "monthly_total_opex",
-    "monthly_noi",
-    "monthly_cash_flow",
-    "gross_yield_pct",
-    "net_yield_pct",
-    "roi_pct",
-    "dscr",
-    "bond_to_rent",
-    "opex_to_rent",
-]
-
-
 def _find_class_index(classes, target_keyword):
     for idx, cls in enumerate(classes):
         value = str(cls).strip().lower()
@@ -56,8 +16,8 @@ def _find_class_index(classes, target_keyword):
 
 
 def apply_threshold_policy(prob_array, class_names, strong_threshold=0.50, weak_threshold=0.50):
-    strong_idx = _find_class_index(class_names, "strong")
-    weak_idx = _find_class_index(class_names, "weak")
+    strong_idx = _find_class_index(class_names, "good")
+    weak_idx = _find_class_index(class_names, "bad")
 
     predictions = []
     for row in prob_array:
@@ -68,16 +28,6 @@ def apply_threshold_policy(prob_array, class_names, strong_threshold=0.50, weak_
         else:
             predictions.append(int(np.argmax(row)))
     return np.array(predictions)
-
-
-def _safe_business_frame(business_df: pd.DataFrame) -> pd.DataFrame:
-    results = business_df.copy()
-
-    for col in BUSINESS_COLUMNS:
-        if col not in results.columns:
-            results[col] = np.nan
-
-    return results
 
 
 def score_properties(model_df: pd.DataFrame, business_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
@@ -99,10 +49,10 @@ def score_properties(model_df: pd.DataFrame, business_df: pd.DataFrame, runtime:
     deployed_policy = str(threshold_config.get("deployed_prediction_policy", "threshold_tuned"))
     recommended = pred_threshold if deployed_policy == "threshold_tuned" else pred_default
 
-    results = _safe_business_frame(business_df)
+    results = business_df.reset_index(drop=True).copy()
 
     for class_name, class_probs in zip(class_names, prob_array.T):
-        results[f"prob_{class_name}"] = class_probs
+        results[f"prob_{class_name}"] = class_probs * 100.0
 
     results["predicted_label_default"] = label_encoder.inverse_transform(pred_default)
     results["predicted_label_threshold"] = label_encoder.inverse_transform(pred_threshold)
