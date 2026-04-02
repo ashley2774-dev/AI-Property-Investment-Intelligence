@@ -5,8 +5,28 @@ import pandas as pd
 
 
 BUSINESS_COLUMNS = [
+    "province",
+    "city",
+    "suburb",
+    "property_type",
+    "bedrooms",
+    "bathrooms",
+    "parking",
     "purchase_price",
     "estimated_rent",
+    "floor_area_sqm",
+    "levy",
+    "rates_taxes",
+    "insurance",
+    "other_opex",
+    "deposit_pct",
+    "interest_rate_pct",
+    "loan_term_years",
+    "vacancy_pct",
+    "management_fee_pct",
+    "maintenance_pct",
+    "annual_growth_pct",
+    "deposit_amount",
     "loan_amount",
     "monthly_bond_payment",
     "monthly_vacancy_cost",
@@ -50,14 +70,25 @@ def apply_threshold_policy(prob_array, class_names, strong_threshold=0.50, weak_
     return np.array(predictions)
 
 
-def score_properties(feature_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
+def _safe_business_frame(business_df: pd.DataFrame) -> pd.DataFrame:
+    results = business_df.copy()
+
+    for col in BUSINESS_COLUMNS:
+        if col not in results.columns:
+            results[col] = np.nan
+
+    return results
+
+
+def score_properties(model_df: pd.DataFrame, business_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
     model = runtime["model"]
     label_encoder = runtime["label_encoder"]
     threshold_config = runtime["threshold_config"]
     class_names = [str(c) for c in label_encoder.classes_]
 
-    pred_default = model.predict(feature_df)
-    prob_array = model.predict_proba(feature_df)
+    pred_default = model.predict(model_df)
+    prob_array = model.predict_proba(model_df)
+
     pred_threshold = apply_threshold_policy(
         prob_array,
         class_names=class_names,
@@ -68,7 +99,8 @@ def score_properties(feature_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
     deployed_policy = str(threshold_config.get("deployed_prediction_policy", "threshold_tuned"))
     recommended = pred_threshold if deployed_policy == "threshold_tuned" else pred_default
 
-    results = feature_df.copy()
+    results = _safe_business_frame(business_df)
+
     for class_name, class_probs in zip(class_names, prob_array.T):
         results[f"prob_{class_name}"] = class_probs
 
@@ -77,28 +109,5 @@ def score_properties(feature_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
     results["recommended_label"] = label_encoder.inverse_transform(recommended)
     results["deployed_prediction_policy"] = deployed_policy
     results["top_probability_pct"] = prob_array.max(axis=1) * 100.0
-
-    # Restore business-facing aliases where present in the model-ready frame.
-    alias_pairs = {
-        "estimated_rent": "estimated_rent",
-        "purchase_price": "purchase_price",
-        "loan_amount": "loan_amount",
-        "monthly_bond_payment": "monthly_bond_payment",
-        "monthly_vacancy_cost": "monthly_vacancy_cost",
-        "monthly_management_fee": "monthly_management_fee",
-        "monthly_maintenance_cost": "monthly_maintenance_cost",
-        "monthly_total_opex": "monthly_total_opex",
-        "monthly_noi": "monthly_noi",
-        "monthly_cash_flow": "monthly_cash_flow",
-        "gross_yield_pct": "gross_yield_pct",
-        "net_yield_pct": "net_yield_pct",
-        "roi_pct": "roi_pct",
-        "dscr": "dscr",
-        "bond_to_rent": "bond_to_rent",
-        "opex_to_rent": "opex_to_rent",
-    }
-    for source, target in alias_pairs.items():
-        if source in feature_df.columns:
-            results[target] = feature_df[source]
 
     return results
