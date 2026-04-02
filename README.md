@@ -59,37 +59,25 @@ Classify property deals into:
 
 ---
 
-## 🔥 Key Differentiator
-
-This project goes beyond prediction.
-
-It includes a **deployment-ready decision layer**:
-
-✔ Probability outputs
-✔ Threshold tuning
-✔ Policy-based predictions
-✔ Recommendation logic
-
----
-
 ## 📊 Model Performance
 
-Final model: RandomForest
-Deployed prediction policy: default_argmax
-prediction_policy	test_accuracy	test_macro_f1
-0	default_argmax	1.0000	1.0000
-1	threshold_tuned	1.0000	1.0000
-Classification Report (Deployed Policy):
-                     precision    recall  f1-score   support
+- **RandomForest** was selected as the final model due to:
+  - Highest cross-validation stability
+  - Strong generalisation performance (CV Macro F1 = 0.9941)
+  - Low variance across folds
 
-Moderate Investment       1.00      1.00      1.00        79
-  Strong Investment       1.00      1.00      1.00       269
-    Weak Investment       1.00      1.00      1.00      1004
+- **GradientBoosting** achieved perfect validation performance but was excluded due to:
+  - Lack of cross-validation results
+  - High risk of overfitting
 
-           accuracy                           1.00      1352
-          macro avg       1.00      1.00      1.00      1352
-       weighted avg       1.00      1.00      1.00      1352
+- **Final Decision:** RandomForest chosen for robustness over raw performance.
 
+| Model                | Val Accuracy | Val Macro F1 | CV Macro F1 Mean | CV Macro F1 Std | CV Stability Rank | Selection Rank |
+|---------------------|-------------|--------------|------------------|-----------------|-------------------|----------------|
+| RandomForest        | 0.9963      | 0.9875       | 0.9941           | 0.0030          | 1.0000            | 4.0000         |
+| ExtraTrees          | 0.9815      | 0.9342       | 0.9236           | 0.0064          | 2.0000            | 7.0000         |
+| LogisticRegression  | 0.9704      | 0.9197       | 0.9175           | 0.0141          | 3.0000            | 10.0000        |
+| GradientBoosting    | 1.0000      | 1.0000       | NaN              | NaN             | NaN               | NaN            |
 ---
 
 ### ⚠️ Important Context
@@ -237,19 +225,6 @@ streamlit run app/streamlit_app.py
 
 ---
 
-## 📌 Why This Project Stands Out
-
-This is not just a model.
-
-It is a **complete decision system**:
-
-✔ Financial logic + ML
-✔ Feature engineering aligned to business
-✔ Threshold-based decisioning
-✔ Deployment-ready artifacts
-✔ Explainability built-in
-
----
 
 ## 👤 Author
 
