@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
@@ -52,6 +51,7 @@ def _single_property_form():
     st.subheader("Single property screening")
 
     col1, col2, col3 = st.columns(3)
+
     with col1:
         province = st.text_input("Province", value="Gauteng")
         city = st.text_input("City", value="Johannesburg")
@@ -62,13 +62,22 @@ def _single_property_form():
             index=0,
         )
         purchase_price = st.number_input(
-            "Purchase price (R)", min_value=100000.0, value=950000.0, step=10000.0
+            "Purchase price (R)",
+            min_value=100000.0,
+            value=950000.0,
+            step=10000.0,
         )
         estimated_rent = st.number_input(
-            "Estimated monthly rent (R)", min_value=1000.0, value=8500.0, step=250.0
+            "Estimated monthly rent (R)",
+            min_value=1000.0,
+            value=8500.0,
+            step=250.0,
         )
         floor_area_sqm = st.number_input(
-            "Floor area (sqm)", min_value=15.0, value=65.0, step=1.0
+            "Floor area (sqm)",
+            min_value=15.0,
+            value=65.0,
+            step=1.0,
         )
 
     with col2:
@@ -77,36 +86,73 @@ def _single_property_form():
         parking = st.number_input("Parking / garage spaces", min_value=0, value=1, step=1)
         levy = st.number_input("Monthly levy (R)", min_value=0.0, value=1200.0, step=100.0)
         rates_taxes = st.number_input(
-            "Monthly rates & taxes (R)", min_value=0.0, value=700.0, step=50.0
+            "Monthly rates & taxes (R)",
+            min_value=0.0,
+            value=700.0,
+            step=50.0,
         )
         insurance = st.number_input(
-            "Monthly insurance (R)", min_value=0.0, value=350.0, step=50.0
+            "Monthly insurance (R)",
+            min_value=0.0,
+            value=350.0,
+            step=50.0,
         )
         other_opex = st.number_input(
-            "Other monthly opex (R)", min_value=0.0, value=250.0, step=50.0
+            "Other monthly opex (R)",
+            min_value=0.0,
+            value=250.0,
+            step=50.0,
         )
 
     with col3:
         deposit_pct = st.slider(
-            "Deposit (%)", min_value=0.0, max_value=50.0, value=10.0, step=1.0
+            "Deposit (%)",
+            min_value=0.0,
+            max_value=50.0,
+            value=10.0,
+            step=1.0,
         )
         interest_rate_pct = st.slider(
-            "Interest rate (%)", min_value=5.0, max_value=18.0, value=11.75, step=0.25
+            "Interest rate (%)",
+            min_value=5.0,
+            max_value=18.0,
+            value=11.75,
+            step=0.25,
         )
         loan_term_years = st.slider(
-            "Loan term (years)", min_value=5, max_value=30, value=20, step=1
+            "Loan term (years)",
+            min_value=5,
+            max_value=30,
+            value=20,
+            step=1,
         )
         vacancy_pct = st.slider(
-            "Vacancy allowance (%)", min_value=0.0, max_value=20.0, value=5.0, step=0.5
+            "Vacancy allowance (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=5.0,
+            step=0.5,
         )
         management_fee_pct = st.slider(
-            "Management fee (%)", min_value=0.0, max_value=20.0, value=8.0, step=0.5
+            "Management fee (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=8.0,
+            step=0.5,
         )
         maintenance_pct = st.slider(
-            "Maintenance allowance (%)", min_value=0.0, max_value=15.0, value=5.0, step=0.5
+            "Maintenance allowance (%)",
+            min_value=0.0,
+            max_value=15.0,
+            value=5.0,
+            step=0.5,
         )
         annual_growth_pct = st.slider(
-            "Annual property growth (%)", min_value=0.0, max_value=20.0, value=6.0, step=0.5
+            "Annual property growth (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=6.0,
+            step=0.5,
         )
 
     return {
@@ -135,19 +181,17 @@ def _single_property_form():
 
 
 def _render_amortization_chart(schedule: pd.DataFrame):
-    fig, ax = plt.subplots(figsize=(10, 5))
-
-    ax.plot(schedule["year"], schedule["property_value"], label="Property Value")
-    ax.plot(schedule["year"], schedule["loan_balance"], label="Loan Balance")
-    ax.plot(schedule["year"], schedule["equity"], label="Equity")
-
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Rands")
-    ax.set_title("Amortization & Equity Growth")
-    ax.grid(True, alpha=0.3)
-    ax.legend()
-
-    st.pyplot(fig)
+    st.markdown("**Projection snapshot**")
+    projection_cols = ["year", "property_value", "loan_balance", "equity"]
+    available_cols = [c for c in projection_cols if c in schedule.columns]
+    if available_cols:
+        display_df = schedule[available_cols].copy()
+        for col in ["property_value", "loan_balance", "equity"]:
+            if col in display_df.columns:
+                display_df[col] = display_df[col].astype(float).map(_fmt_money)
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
+    else:
+        st.dataframe(schedule, use_container_width=True, hide_index=True)
 
 
 def main():
@@ -197,6 +241,7 @@ def main():
                     .rename(columns={"index": "Class", 0: "Probability"})
                 )
                 prob_display["Probability"] = (prob_display["Probability"] * 100).round(2)
+                prob_display["Probability"] = prob_display["Probability"].map(lambda x: f"{x:.2f}%")
                 st.dataframe(prob_display, use_container_width=True, hide_index=True)
 
             st.subheader("Green flags")
@@ -225,6 +270,7 @@ def main():
             st.info("Screen a property in the Summary tab to populate the financial breakdown.")
         else:
             result = st.session_state["latest_result"]
+
             financial_rows = [
                 ("Purchase price", result.get("purchase_price", 0)),
                 ("Estimated rent", result.get("estimated_rent", 0)),
@@ -263,6 +309,7 @@ def main():
         else:
             latest_input = st.session_state["latest_input"]
             latest_result = st.session_state["latest_result"]
+
             schedule = build_amortization_schedule(
                 purchase_price=float(latest_result.get("purchase_price", 0)),
                 loan_amount=float(latest_result.get("loan_amount", 0)),
@@ -279,13 +326,21 @@ def main():
             c3.metric("Cash-flow break-even year", summary["break_even_year_display"])
 
             _render_amortization_chart(schedule)
-            st.dataframe(schedule, use_container_width=True, hide_index=True)
+
+            st.markdown("**Full amortization schedule**")
+            schedule_display = schedule.copy()
+            for col in ["property_value", "loan_balance", "equity"]:
+                if col in schedule_display.columns:
+                    schedule_display[col] = schedule_display[col].astype(float).map(_fmt_money)
+            st.dataframe(schedule_display, use_container_width=True, hide_index=True)
 
     with tabs[3]:
         st.subheader("Batch scoring")
         st.write(
-            "Upload a CSV using the provided template. The app will calculate financial features, align the frame to the training feature list, and score each property with the real model."
+            "Upload a CSV using the provided template. The app will calculate financial features, "
+            "align the frame to the training feature list, and score each property with the real model."
         )
+
         template_path = Path("sample_batch_input.csv")
         if template_path.exists():
             with open(template_path, "rb") as f:
@@ -328,6 +383,7 @@ def main():
             if report_path.exists():
                 st.write(f"Preview: {report_path}")
                 st.dataframe(pd.read_csv(report_path).head(20), use_container_width=True)
+
 
 if __name__ == "__main__":
     main()
