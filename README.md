@@ -228,5 +228,6 @@ streamlit run app/streamlit_app.py
 
 ## 👤 Author
 
-Ashley Mathabatha
+** Matsobane Ashley Mathabatha**
+
 Project Manager | Data Scientist | Economist
