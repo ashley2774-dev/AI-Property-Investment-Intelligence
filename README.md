@@ -229,4 +229,4 @@ streamlit run app/streamlit_app.py
 ## 👤 Author
 
 Ashley Mathabatha
-Data Scientist | Property Investment Intelligence
+Project Manager | Data Scientist | Economist
