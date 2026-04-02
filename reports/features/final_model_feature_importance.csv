@@ -1,0 +1,384 @@
+feature,importance
+num__debt_service_headroom_win,0.5660977406405029
+num__fixed_cost_burden,0.3575761346647456
+num__cash_flow_margin_win,0.07632612469474419
+num__rent_vs_suburb_internal_median,1.1736489321066305e-16
+cat__suburb_Sophiatown,9.68557325556167e-17
+num__rates_to_rent_win,9.228764885265274e-17
+num__rent_median_city_type_bed,8.594847955828853e-17
+cat__suburb_Sandown,8.543817278290366e-17
+num__rent_median_suburb_bed_missing_flag,8.185432816879397e-17
+num__monthly_rent_to_price,8.183255131878881e-17
+num__rent_vs_city_median,7.847625822723122e-17
+cat__suburb_Mondeor,7.803566113889799e-17
+cat__suburb_Parkmore,7.756672751508862e-17
+cat__suburb_Eldorado Park,7.640382325979548e-17
+cat__suburb_Vorna Valley,7.6089753956847e-17
+cat__rent_estimation_source_suburb,7.595847563519609e-17
+cat__suburb_Protea Glen,7.53921080417244e-17
+cat__suburb_Ennerdale,7.24562339530042e-17
+num__rent_vs_city_median_win,7.09540429584775e-17
+num__rent_mean_suburb_type_bed_missing_flag,6.971919290467936e-17
+cat__suburb_Douglasdale,6.96844987610796e-17
+num__parking_spaces,6.916123356552283e-17
+num__rates_taxes,6.912873452284715e-17
+num__price_per_sqm_vs_local_median_missing_flag,6.517100928782724e-17
+cat__suburb_Rivonia,6.468004919062727e-17
+num__price_vs_city_price_median_win,6.347571401135173e-17
+cat__property_type_House,6.331494077227143e-17
+cat__suburb_Randpark Ridge,6.193647993605044e-17
+num__rent_mean_suburb_bed_missing_flag,6.17875726838021e-17
+cat__suburb_Bordeaux,6.167549760977716e-17
+num__price_per_sqm_missing_flag,6.07839968102545e-17
+cat__property_type_Apartment,5.996359392201167e-17
+num__levies_to_rent_win,5.920338088333247e-17
+num__rent_vs_province_median,5.841598226235185e-17
+cat__city_Johannesburg South,5.790079995143525e-17
+num__rent_vs_suburb_type_bed_median_missing_flag,5.685808393241204e-17
+num__rent_vs_suburb_median_win_missing_flag,5.6599636045151e-17
+num__maintenance_cost,5.642547675555832e-17
+num__parking_per_bedroom_missing_flag,5.635786515690405e-17
+num__price_per_bedroom_missing_flag,5.627597127690351e-17
+num__property_type_density,5.603783159435546e-17
+num__rent_vs_suburb_median_missing_flag,5.505633433947109e-17
+num__rent_per_bathroom,5.442504553717907e-17
+cat__suburb_Ormonde,5.373743494664743e-17
+cat__city_Rosebank And Parktown,5.371445971320303e-17
+num__bond_payment,5.3410703988073776e-17
+num__rent_mean_suburb_bed,5.30107814529032e-17
+num__bathrooms,5.2502876923372836e-17
+num__levies,5.2341253128518054e-17
+num__garage,5.068060466696746e-17
+cat__suburb_Noordwyk,5.018860928531629e-17
+num__floor_area_sqm,4.9306710988600413e-17
+num__rent_dispersion_suburb_type_bed_missing_flag,4.925717916928391e-17
+cat__suburb_Lyndhurst,4.901173621177265e-17
+num__bathroom_density_floor,4.8729621854273104e-17
+cat__suburb_Waterfall Estate,4.811563702081167e-17
+num__rent_mean_suburb_type_bed,4.782350958362467e-17
+cat__suburb_Soweto Central,4.705028147563096e-17
+num__annual_rent_per_sqm,4.6944288266255865e-17
+num__city_listing_density,4.6164785848573185e-17
+cat__suburb_Morningside,4.600529249444431e-17
+cat__suburb_Sandton Central,4.565804191236611e-17
+cat__suburb_Meadowlands,4.56496881520358e-17
+cat__suburb_Clayville,4.558439821398083e-17
+num__rent_median_suburb_missing_flag,4.5507214907904385e-17
+cat__suburb_Broadacres,4.5461575852197614e-17
+num__price_vs_suburb_median_rent_multiple,4.531597101660591e-17
+num__price_per_sqm,4.4920806607840737e-17
+num__monthly_rent_to_price_win,4.33375212618991e-17
+num__total_expenses,4.2348616273975526e-17
+cat__city_Sandton,4.1877472592358727e-17
+num__rent_count_suburb_type_bed,4.1799830176550025e-17
+num__rent_mean_suburb,4.157002366610072e-17
+cat__suburb_Diepkloof,4.141992216569756e-17
+num__deposit_amount,4.141144912874034e-17
+num__bedroom_density_floor_missing_flag,4.1340600018100623e-17
+num__rent_dispersion_suburb_missing_flag,4.1297221260461487e-17
+cat__suburb_Melrose Arch,4.038308093578864e-17
+num__rent_median_suburb_type_bed_missing_flag,3.991302510826884e-17
+num__parking_spaces_missing_flag,3.974576351685155e-17
+num__rent_median_suburb,3.974027625706965e-17
+num__bond_payment_to_income,3.892325965914626e-17
+num__suburb_type_median_price_per_sqm,3.8822503522177834e-17
+cat__suburb_Johannesburg Cbd,3.876647259306706e-17
+num__bathroom_density_floor_missing_flag,3.8720611186231835e-17
+num__suburb_price_median,3.832999144244539e-17
+num__bond_payment_to_income_win,3.777249380430797e-17
+num__price_per_sqm_vs_local_median_win_missing_flag,3.750315434769004e-17
+cat__suburb_Berea,3.731857550732575e-17
+num__land_area_sqm,3.6971739000104425e-17
+num__rent_per_sqm,3.5145305834160056e-17
+cat__suburb_Mulbarton,3.479872051047633e-17
+cat__suburb_Erand Gardens,3.2531446008393796e-17
+num__rent_vs_suburb_median,3.2354176862825865e-17
+num__loan_amount,3.130587848627075e-17
+num__rent_count_city_type_bed_missing_flag,3.0884891910680755e-17
+num__price_per_sqm_vs_local_median,3.0693028908978457e-17
+cat__suburb_North Riding,3.0281881620772393e-17
+num__rent_dispersion_suburb,2.983906576852073e-17
+num__annual_rent,2.949068285642029e-17
+num__price_vs_city_median_rent_multiple,2.9425546552720885e-17
+num__gross_income,2.93948572383599e-17
+cat__suburb_Dainfern Valley,2.933876398658169e-17
+cat__suburb_Fourways,2.9250860464941866e-17
+cat__city_Lenasia To Ennerdale,2.9161319639071107e-17
+num__bond_to_rent,2.910282703699094e-17
+num__is_compact_unit,2.90962858744414e-17
+cat__suburb_Newtown,2.8728449944674075e-17
+cat__suburb_Paulshof,2.853604982729607e-17
+num__suburb_listing_density,2.822081146538099e-17
+cat__rent_estimation_source_suburb_bedrooms,2.817947029861545e-17
+num__bedrooms,2.808038084882565e-17
+cat__suburb_Gallo Manor,2.784790395481992e-17
+num__rent_mean_suburb_missing_flag,2.749898033646585e-17
+num__rent_count_suburb_type_bed_missing_flag,2.7310244317599805e-17
+cat__suburb_Bedford Gardens,2.713612250699844e-17
+num__floor_to_land_ratio,2.7051387538382955e-17
+num__purchase_price_rands,2.6313441493011464e-17
+num__rent_median_suburb_bed,2.6120328178541758e-17
+cat__suburb_South Hills,2.610881893889372e-17
+cat__suburb_Albertville,2.6037378889261126e-17
+num__price_per_land_sqm_missing_flag,2.602484325838785e-17
+cat__suburb_Crosby,2.601055999370712e-17
+num__is_family_sized_unit,2.6005038065628925e-17
+num__rent_per_bedroom,2.5793835647905053e-17
+cat__city_Randburg,2.5763908954872703e-17
+cat__rent_estimation_source_city_property_type_bedrooms,2.572363302634486e-17
+cat__suburb_Sandringham,2.5721037655591927e-17
+num__rates_to_rent,2.56654134261103e-17
+num__rates_taxes_clean,2.551943993951936e-17
+cat__suburb_Darrenwood,2.547820417046665e-17
+num__rent_median_city,2.545847319571808e-17
+cat__suburb_Kensington B,2.5445539542700542e-17
+cat__suburb_Orchards,2.5346277696772515e-17
+cat__suburb_Lonehill,2.5263309047847856e-17
+cat__suburb_Edenburg,2.5166422437346797e-17
+cat__suburb_Glenvista,2.5097433521965796e-17
+cat__suburb_Lawley,2.4659127386370586e-17
+num__price_per_land_sqm_win,2.455276764527186e-17
+num__non_debt_opex,2.4433252715653707e-17
+num__rent_mean_city_type_bed,2.4387578578589442e-17
+num__rent_vs_suburb_bed_median,2.4186979120885565e-17
+num__rent_estimate_high_evidence_flag,2.3914797456765796e-17
+cat__suburb_Blue Hills,2.374217385101497e-17
+cat__suburb_Bram Fisherville,2.322805260596204e-17
+cat__city_Northcliff,2.3151599675219654e-17
+cat__suburb_Riverlea,2.2971245725550122e-17
+cat__suburb_Naturena,2.265979494659211e-17
+cat__suburb_Carlswald Estate,2.2360149654537227e-17
+num__opex_to_income,2.1767814756893157e-17
+cat__suburb_Halfway Gardens,2.0933162243441556e-17
+num__opex_to_rent_win,2.0226701803295764e-17
+cat__suburb_Nooitgedacht,1.9959426496144068e-17
+num__floor_to_land_ratio_missing_flag,1.878602743345866e-17
+cat__suburb_Turffontein,1.8545076557876868e-17
+cat__suburb_Oakdene,1.828893079473812e-17
+num__rent_count_suburb_bed_missing_flag,1.7897569865661507e-17
+cat__suburb_Windsor East,1.705370585666932e-17
+num__bond_to_rent_win,1.6810551318444637e-17
+num__rent_count_suburb_bed,1.6410153137887477e-17
+cat__suburb_Bryanston,1.5989297667694143e-17
+num__rent_count_suburb_missing_flag,1.5882950141076757e-17
+num__total_rooms_proxy,1.567798889340803e-17
+num__city_rent_median_feature,1.5557968798740695e-17
+num__levies_to_rent,1.5491940348846284e-17
+num__deposit_to_price,1.5310720227665256e-17
+num__price_vs_suburb_price_median,1.505415009662818e-17
+num__price_per_bathroom,1.4961746003635366e-17
+num__rent_count_suburb,1.4732250705557612e-17
+cat__suburb_Sandhurst,1.4479085737041755e-17
+cat__suburb_Northgate,1.4417517310729012e-17
+cat__suburb_Boskruin,1.439127858333508e-17
+cat__suburb_Windsor West,1.3981866320067415e-17
+cat__suburb_Suideroord,1.392922429641166e-17
+num__city_price_median,1.3842460359496984e-17
+num__suburb_rent_median_feature,1.3812011772405932e-17
+cat__suburb_Lenasia South,1.3658261393639826e-17
+num__rent_per_sqm_missing_flag,1.364562534210414e-17
+num__garage_missing_flag,1.3427404045253831e-17
+num__land_area_sqm_missing_flag,1.3365390086031412e-17
+cat__suburb_Rosebank,1.327947125550302e-17
+num__opex_to_rent,1.3138807109283894e-17
+num__rent_per_sqm_win,1.3131181616821948e-17
+num__vacancy_cost,1.3087027706624133e-17
+num__rent_vs_suburb_bed_median_missing_flag,1.2836881641855337e-17
+cat__suburb_Linden,1.2758545130591518e-17
+cat__city_Soweto,1.2682608694691608e-17
+cat__city_North Riding To Lanseria,1.2570906253313976e-17
+cat__suburb_Beverley,1.2503648943189194e-17
+cat__suburb_Glen Austin,1.2436509217248052e-17
+cat__suburb_Magaliessig,1.2306799858092608e-17
+cat__suburb_Ferndale,1.2067797988146276e-17
+num__price_per_land_sqm_win_missing_flag,1.2053928137885935e-17
+cat__suburb_Carlswald,1.2040715929259853e-17
+cat__suburb_Morningside Manor,1.2023831438182408e-17
+cat__suburb_Sharonlea,1.1868592990340562e-17
+num__rent_estimate_low_evidence_flag,1.1865383587820054e-17
+num__non_debt_opex_to_rent,1.1584325551624845e-17
+num__gross_rent_to_price_win,1.1423662574007785e-17
+cat__suburb_Sundowner,1.1399610120255015e-17
+num__rent_mean_city_type_bed_missing_flag,1.1308622092812692e-17
+num__rent_median_city_type_bed_missing_flag,1.1039699304110637e-17
+num__price_vs_suburb_price_median_win,1.096496872075081e-17
+cat__suburb_Kensington,1.093212911926095e-17
+cat__suburb_Chartwell,1.0807124908815013e-17
+cat__suburb_Marshalltown,1.0554874178771039e-17
+cat__suburb_Craighall,9.909810358372638e-18
+num__parking_per_bedroom,9.657144419257016e-18
+cat__suburb_Devland,9.634473661494038e-18
+num__rent_per_sqm_win_missing_flag,9.509393607678651e-18
+num__rent_dispersion_suburb_type_bed,8.745794281858823e-18
+cat__suburb_Kya Sands,1.0065582027284677e-18
+cat__suburb_Naledi,0.0
+cat__suburb_Newlands,0.0
+cat__city_Bedfordview,0.0
+cat__suburb_Zakariyya Park,0.0
+cat__suburb_Noordhang,0.0
+cat__suburb_Yeoville,0.0
+cat__suburb_Woodmead,0.0
+cat__suburb_Northcliff,0.0
+cat__suburb_Steyn City,0.0
+cat__suburb_Maroeladal,0.0
+cat__suburb_Montgomery Park,0.0
+cat__city_Johannesburg Central,0.0
+cat__city_Midrand,0.0
+cat__suburb_Norwood,0.0
+cat__suburb_Moffat View,0.0
+cat__suburb_Melville,0.0
+cat__suburb_Savoy Estate,0.0
+cat__suburb_Melrose Estate,0.0
+cat__province_Gauteng,0.0
+cat__suburb_Melrose,0.0
+cat__suburb_Sol Plaatjie,0.0
+cat__property_type_Nan,0.0
+cat__rent_estimation_source_city,0.0
+cat__suburb_Sonneglans,0.0
+cat__suburb_Northwold,0.0
+cat__suburb_Olivedale,0.0
+cat__suburb_Sagewood,0.0
+cat__suburb_Victory Park,0.0
+cat__suburb_Ridgeway,0.0
+cat__suburb_Regents Park,0.0
+cat__suburb_Sunninghill,0.0
+cat__suburb_Randpark,0.0
+cat__suburb_The Hill,0.0
+cat__suburb_Quellerina,0.0
+cat__suburb_Protea North,0.0
+cat__suburb_Riverside View,0.0
+cat__suburb_President Park,0.0
+cat__suburb_Pimville,0.0
+cat__suburb_Tshepisong,0.0
+cat__suburb_Robertsham,0.0
+cat__suburb_Petervale,0.0
+cat__suburb_Parkwood,0.0
+cat__suburb_Parktown,0.0
+cat__suburb_Saddlebrook Estate,0.0
+cat__suburb_Wendywood,0.0
+cat__suburb_Westbury,0.0
+cat__suburb_Parkhurst,0.0
+cat__suburb_Robindale,0.0
+cat__suburb_Orlando,0.0
+cat__suburb_Roosevelt Park,0.0
+cat__suburb_Westdene,0.0
+cat__suburb_Willaway,0.0
+cat__suburb_Summerset,0.0
+cat__suburb_Rosettenville,0.0
+cat__suburb_Orange Grove,0.0
+cat__suburb_River Club,0.0
+cat__suburb_Winchester Hills,0.0
+cat__suburb_Observatory,0.0
+cat__suburb_Parktown North,0.0
+num__purchase_price,0.0
+cat__suburb_Malanshof,0.0
+num__rent_vs_suburb_median_win,0.0
+num__cash_invested_to_price,0.0
+num__transfer_costs_to_price,0.0
+num__rent_source_score,0.0
+num__rent_estimate_observation_count,0.0
+num__rent_dispersion_city,0.0
+num__price_vs_city_price_median,0.0
+num__rent_vs_city_internal_median,0.0
+num__floor_area_sqm_missing_flag,0.0
+num__price_per_sqm_win,0.0
+num__ltv_win,0.0
+num__price_per_sqm_vs_local_median_win,0.0
+num__price_vs_suburb_median_rent_multiple_missing_flag,0.0
+num__vacancy_to_rent,0.0
+num__rent_per_bedroom_missing_flag,0.0
+num__annual_rent_per_sqm_missing_flag,0.0
+num__price_per_sqm_win_missing_flag,0.0
+cat__suburb_Alveda,0.0
+cat__suburb_Aspen Hills,0.0
+cat__suburb_Atholl,0.0
+cat__suburb_Auckland Park,0.0
+cat__suburb_Barbeque Downs,0.0
+cat__suburb_Bassonia,0.0
+cat__suburb_Bedfordview,0.0
+cat__suburb_Bergbron,0.0
+num__ltv,0.0
+num__maintenance_to_rent,0.0
+cat__suburb_Blairgowrie,0.0
+num__total_cash_invested,0.0
+num__rent_median_suburb_type_bed,0.0
+num__rent_count_city_type_bed,0.0
+num__rent_mean_city,0.0
+num__rent_count_city,0.0
+num__rent_median_province,0.0
+num__rent_mean_province,0.0
+num__rent_count_province,0.0
+num__estimated_monthly_rent,0.0
+num__deposit_pct,0.0
+num__transfer_cost_rate,0.0
+num__transfer_costs,0.0
+num__annual_interest_rate,0.0
+num__rent_vs_suburb_type_bed_median,0.0
+num__loan_term_years,0.0
+num__other_income,0.0
+num__levies_clean,0.0
+num__maintenance_rate,0.0
+num__vacancy_rate,0.0
+num__bedroom_density_floor,0.0
+num__parking_total,0.0
+num__is_large_land_property,0.0
+num__price_per_land_sqm,0.0
+num__price_per_bedroom,0.0
+num__gross_rent_to_price,0.0
+cat__suburb_Blackheath,0.0
+cat__suburb_Bloubosrand,0.0
+cat__suburb_Linmeyer,0.0
+cat__suburb_Jukskei Park,0.0
+cat__suburb_Greenside,0.0
+cat__suburb_Halfway House,0.0
+cat__suburb_Highlands North,0.0
+cat__suburb_Houghton Estate,0.0
+cat__suburb_Hurlingham,0.0
+cat__suburb_Hurlingham Manor,0.0
+cat__suburb_Hyde Park,0.0
+cat__suburb_Illovo,0.0
+cat__suburb_Jabulani,0.0
+cat__suburb_Jackal Creek Northriding,0.0
+cat__suburb_Jeppestown,0.0
+cat__suburb_Kenilworth,0.0
+cat__suburb_Glenferness Ah,0.0
+cat__suburb_Khyber Rock,0.0
+cat__suburb_Kibler Park,0.0
+cat__suburb_Killarney,0.0
+cat__suburb_Kyalami,0.0
+cat__suburb_Kyalami Ah,0.0
+cat__suburb_Kyalami Hills,0.0
+cat__suburb_Lanseria And Surrounds,0.0
+cat__suburb_Lenasia,0.0
+cat__suburb_Liefde En Vrede,0.0
+cat__suburb_Linbro Park,0.0
+cat__suburb_Linksfield,0.0
+cat__suburb_Grand Central,0.0
+cat__suburb_Glenanda,0.0
+cat__suburb_Bosmont,0.0
+cat__suburb_Cosmo City,0.0
+cat__suburb_Braamfontein,0.0
+cat__suburb_Bramley Park,0.0
+cat__suburb_Brixton,0.0
+cat__suburb_Bromhof,0.0
+cat__suburb_Bruma,0.0
+cat__suburb_Buccleuch,0.0
+cat__suburb_Carlswald North Estate,0.0
+cat__suburb_Cedar Creek,0.0
+cat__suburb_Cedar Lakes,0.0
+cat__suburb_City And Suburban Maboneng,0.0
+cat__suburb_Corlett Gardens,0.0
+cat__suburb_Craigavon,0.0
+cat__suburb_Florida Glen,0.0
+cat__suburb_Crowthorne,0.0
+cat__suburb_Dainfern,0.0
+cat__suburb_Dobsonville,0.0
+cat__suburb_Dunkeld,0.0
+cat__suburb_Dunkeld West,0.0
+cat__suburb_Ebony Park,0.0
+cat__suburb_Elandspark,0.0
+cat__suburb_Emmarentia,0.0
+cat__suburb_Essexwold,0.0
+cat__suburb_Eye Of Africa,0.0
+cat__suburb_Fairland,0.0
+cat__rent_estimation_source_suburb_property_type_bedrooms,0.0
