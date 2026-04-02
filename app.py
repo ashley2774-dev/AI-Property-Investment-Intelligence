@@ -173,40 +173,11 @@ def _single_property_form():
     }
 
 
-def _normalize_result_fields(result: dict) -> dict:
-    if "estimated_rent" not in result and "monthly_rent" in result:
-        result["estimated_rent"] = result["monthly_rent"]
-
-    if "gross_yield_pct" not in result and "gross_yield" in result:
-        result["gross_yield_pct"] = float(result["gross_yield"]) * 100
-
-    if "net_yield_pct" not in result and "net_yield" in result:
-        result["net_yield_pct"] = float(result["net_yield"]) * 100
-
-    if "roi_pct" not in result and "roi" in result:
-        result["roi_pct"] = float(result["roi"]) * 100
-
-    return result
-
-
 def _confidence_display(result: dict) -> str:
     confidence_value = float(result.get("top_probability_pct", 0))
     if confidence_value <= 1:
         confidence_value *= 100
     return _fmt_pct(confidence_value)
-
-
-def _merge_without_duplicate_columns(left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
-    left = left.reset_index(drop=True).copy()
-    right = right.reset_index(drop=True).copy()
-
-    overlapping = [col for col in right.columns if col in left.columns]
-    if overlapping:
-        right = right.drop(columns=overlapping)
-
-    merged = pd.concat([left, right], axis=1)
-    merged = merged.loc[:, ~merged.columns.duplicated()].copy()
-    return merged
 
 
 def _render_amortization_table(schedule: pd.DataFrame):
@@ -219,9 +190,9 @@ def _render_amortization_table(schedule: pd.DataFrame):
         for col in ["property_value", "loan_balance", "equity"]:
             if col in display_df.columns:
                 display_df[col] = display_df[col].astype(float).map(_fmt_money)
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        st.dataframe(display_df.astype(str), use_container_width=True, hide_index=True)
     else:
-        st.dataframe(schedule, use_container_width=True, hide_index=True)
+        st.dataframe(schedule.astype(str), use_container_width=True, hide_index=True)
 
 
 def main():
@@ -241,19 +212,21 @@ def main():
     _render_artifact_warning()
     runtime = get_runtime()
 
-    tabs = st.tabs(["Summary", "Financials", "Amortization & equity", "Batch scoring", "Artifacts"])
+    tabs = st.tabs(
+        ["Summary", "Financials", "Amortization & equity", "Batch scoring", "Artifacts"]
+    )
 
     with tabs[0]:
         user_input = _single_property_form()
         score_clicked = st.button("Screen property", type="primary")
 
         if score_clicked:
-            property_df = build_single_property_features(user_input, runtime["feature_names"])
-            scored = score_properties(property_df, runtime)
-
-            full_result_df = _merge_without_duplicate_columns(property_df, scored)
-            result = full_result_df.iloc[0].to_dict()
-            result = _normalize_result_fields(result)
+            business_df, model_df = build_single_property_features(
+                user_input,
+                runtime["feature_names"],
+            )
+            scored = score_properties(model_df, business_df, runtime)
+            result = scored.iloc[0].to_dict()
 
             flag_pack = generate_flags(result)
 
@@ -264,18 +237,18 @@ def main():
             c4.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
 
             st.subheader("Probability breakdown")
-            prob_cols = [c for c in full_result_df.columns if c.startswith("prob_")]
+            prob_cols = [c for c in scored.columns if c.startswith("prob_")]
             if prob_cols:
                 prob_display = (
-                    full_result_df[prob_cols]
+                    scored[prob_cols]
                     .rename(columns=lambda x: x.replace("prob_", "").title())
                     .T
                     .reset_index()
                     .rename(columns={"index": "Class", 0: "Probability"})
                 )
-                prob_display["Probability"] = (prob_display["Probability"] * 100).round(2)
+                prob_display["Probability"] = prob_display["Probability"].astype(float).round(2)
                 prob_display["Probability"] = prob_display["Probability"].map(lambda x: f"{x:.2f}%")
-                st.dataframe(prob_display, use_container_width=True, hide_index=True)
+                st.dataframe(prob_display.astype(str), use_container_width=True, hide_index=True)
 
             st.subheader("Green flags")
             if flag_pack["green_flags"]:
@@ -292,7 +265,7 @@ def main():
                 st.write("No major red flags identified from the current inputs.")
 
             st.subheader("Model-ready preview")
-            st.dataframe(full_result_df.astype(str), use_container_width=True)
+            st.dataframe(scored.astype(str), use_container_width=True)
 
             st.session_state["latest_result"] = result
             st.session_state["latest_input"] = user_input
@@ -318,7 +291,7 @@ def main():
             ]
             financial_df = pd.DataFrame(financial_rows, columns=["Metric", "Value"])
             financial_df["Value"] = financial_df["Value"].astype(float).map(_fmt_money)
-            st.dataframe(financial_df, use_container_width=True, hide_index=True)
+            st.dataframe(financial_df.astype(str), use_container_width=True, hide_index=True)
 
             ratio_rows = [
                 ("Gross yield (%)", result.get("gross_yield_pct", 0)),
@@ -330,10 +303,12 @@ def main():
             ]
             ratio_df = pd.DataFrame(ratio_rows, columns=["Ratio", "Value"])
             ratio_df["Value"] = ratio_df.apply(
-                lambda r: _fmt_pct(float(r["Value"])) if "%" in r["Ratio"] else f"{float(r['Value']):,.2f}",
+                lambda r: _fmt_pct(float(r["Value"]))
+                if "%" in r["Ratio"]
+                else f"{float(r['Value']):,.2f}",
                 axis=1,
             )
-            st.dataframe(ratio_df, use_container_width=True, hide_index=True)
+            st.dataframe(ratio_df.astype(str), use_container_width=True, hide_index=True)
 
     with tabs[2]:
         st.subheader("Amortization & equity")
@@ -387,9 +362,11 @@ def main():
         uploaded = st.file_uploader("Upload property CSV", type=["csv"])
         if uploaded is not None:
             batch_df = pd.read_csv(uploaded)
-            prepared = coerce_batch_input(batch_df, runtime["feature_names"])
-            scored_batch = score_properties(prepared, runtime)
-            scored_batch = scored_batch.loc[:, ~scored_batch.columns.duplicated()].copy()
+            business_batch_df, model_batch_df = coerce_batch_input(
+                batch_df,
+                runtime["feature_names"],
+            )
+            scored_batch = score_properties(model_batch_df, business_batch_df, runtime)
             st.dataframe(scored_batch.astype(str), use_container_width=True)
             st.download_button(
                 "Download scored results",
