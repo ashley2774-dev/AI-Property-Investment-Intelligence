@@ -170,14 +170,12 @@ def _single_property_form():
         "management_fee_pct": management_fee_pct,
         "maintenance_pct": maintenance_pct,
         "annual_growth_pct": annual_growth_pct,
+        "rent_estimation_source": "user_input",
     }
 
 
 def _confidence_display(result: dict) -> str:
-    confidence_value = float(result.get("top_probability_pct", 0))
-    if confidence_value <= 1:
-        confidence_value *= 100
-    return _fmt_pct(confidence_value)
+    return _fmt_pct(result.get("top_probability_pct", 0))
 
 
 def _render_amortization_table(schedule: pd.DataFrame):
@@ -193,6 +191,24 @@ def _render_amortization_table(schedule: pd.DataFrame):
         st.dataframe(display_df.astype(str), use_container_width=True, hide_index=True)
     else:
         st.dataframe(schedule.astype(str), use_container_width=True, hide_index=True)
+
+
+def _build_probability_table(scored: pd.DataFrame) -> pd.DataFrame:
+    prob_cols = [c for c in scored.columns if c.startswith("prob_")]
+    if not prob_cols:
+        return pd.DataFrame()
+
+    prob_display = (
+        scored[prob_cols]
+        .rename(columns=lambda x: x.replace("prob_", "").title())
+        .T
+        .reset_index()
+        .rename(columns={"index": "Class", 0: "Probability (%)"})
+    )
+    prob_display["Probability (%)"] = prob_display["Probability (%)"].astype(float).round(2)
+    prob_display = prob_display.sort_values("Probability (%)", ascending=False).reset_index(drop=True)
+    prob_display["Probability (%)"] = prob_display["Probability (%)"].map(lambda x: f"{x:.2f}%")
+    return prob_display
 
 
 def main():
@@ -233,32 +249,23 @@ def main():
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("Recommended label", str(result.get("recommended_label", "unknown")).title())
             c2.metric("Confidence", _confidence_display(result))
-            c3.metric("Monthly cash flow", _fmt_money(float(result.get("monthly_cash_flow", 0))))
+            c3.metric("Monthly cash flow", _fmt_money(result.get("monthly_cash_flow", 0)))
             c4.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
 
             st.subheader("Probability breakdown")
-            prob_cols = [c for c in scored.columns if c.startswith("prob_")]
-            if prob_cols:
-                prob_display = (
-                    scored[prob_cols]
-                    .rename(columns=lambda x: x.replace("prob_", "").title())
-                    .T
-                    .reset_index()
-                    .rename(columns={"index": "Class", 0: "Probability"})
-                )
-                prob_display["Probability"] = prob_display["Probability"].astype(float).round(2)
-                prob_display["Probability"] = prob_display["Probability"].map(lambda x: f"{x:.2f}%")
+            prob_display = _build_probability_table(scored)
+            if not prob_display.empty:
                 st.dataframe(prob_display.astype(str), use_container_width=True, hide_index=True)
 
             st.subheader("Green flags")
-            if flag_pack["green_flags"]:
+            if flag_pack.get("green_flags"):
                 for item in flag_pack["green_flags"]:
                     st.success(item)
             else:
                 st.write("No strong green flags identified from the current inputs.")
 
             st.subheader("Red flags")
-            if flag_pack["red_flags"]:
+            if flag_pack.get("red_flags"):
                 for item in flag_pack["red_flags"]:
                     st.error(item)
             else:
@@ -269,6 +276,7 @@ def main():
 
             st.session_state["latest_result"] = result
             st.session_state["latest_input"] = user_input
+            st.session_state["latest_scored"] = scored
 
     with tabs[1]:
         st.subheader("Financials")
@@ -280,6 +288,7 @@ def main():
             financial_rows = [
                 ("Purchase price", result.get("purchase_price", 0)),
                 ("Estimated rent", result.get("estimated_rent", 0)),
+                ("Deposit amount", result.get("deposit_amount", 0)),
                 ("Loan amount", result.get("loan_amount", 0)),
                 ("Monthly bond payment", result.get("monthly_bond_payment", 0)),
                 ("Monthly vacancy allowance", result.get("monthly_vacancy_cost", 0)),
@@ -300,6 +309,8 @@ def main():
                 ("DSCR", result.get("dscr", 0)),
                 ("Bond-to-rent", result.get("bond_to_rent", 0)),
                 ("Opex-to-rent", result.get("opex_to_rent", 0)),
+                ("LTV", result.get("ltv", 0)),
+                ("Deposit-to-price", result.get("deposit_to_price", 0)),
             ]
             ratio_df = pd.DataFrame(ratio_rows, columns=["Ratio", "Value"])
             ratio_df["Value"] = ratio_df.apply(
@@ -384,6 +395,12 @@ def main():
             "threshold_config_path": str(runtime["paths"]["threshold_config"]),
         }
         st.json(manifest)
+
+        if "latest_scored" in st.session_state:
+            latest_scored = st.session_state["latest_scored"]
+            st.markdown("**Live inference diagnostics**")
+            st.write("Rows:", int(latest_scored.shape[0]))
+            st.write("Columns:", int(latest_scored.shape[1]))
 
         optional_reports = [
             Path("reports/metrics/final_model_metrics_summary.csv"),
