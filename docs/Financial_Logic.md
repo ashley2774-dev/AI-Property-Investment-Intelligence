@@ -1,4 +1,4 @@
-# Financial Logic — Property Investment Intelligence SA
+# Financial Logic Property Investment Intelligence SA
 
 ## 1. Overview
 
