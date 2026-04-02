@@ -4,29 +4,76 @@ import numpy as np
 import pandas as pd
 
 
-def _find_class_index(classes, target_keyword):
-    for idx, cls in enumerate(classes):
-        value = str(cls).strip().lower()
-        if value == target_keyword:
-            return idx
-    for idx, cls in enumerate(classes):
-        if target_keyword in str(cls).strip().lower():
-            return idx
-    raise ValueError(f"Could not find class containing keyword: {target_keyword}")
+def _normalize_label(value: str) -> str:
+    return str(value).strip().lower().replace("_", " ").replace("-", " ")
+
+
+def _find_first_matching_index(classes, keywords):
+    normalized = [_normalize_label(c) for c in classes]
+
+    for keyword in keywords:
+        keyword_norm = _normalize_label(keyword)
+        for idx, cls in enumerate(normalized):
+            if cls == keyword_norm:
+                return idx
+
+    for keyword in keywords:
+        keyword_norm = _normalize_label(keyword)
+        for idx, cls in enumerate(normalized):
+            if keyword_norm in cls:
+                return idx
+
+    return None
+
+
+def _resolve_threshold_indices(class_names):
+    """
+    Try to map the model's class labels to:
+    - strong / best class
+    - weak / worst class
+
+    Supports labels like:
+    - Good / Moderate / Bad
+    - Strong Investment / Average Investment / Weak Investment
+    - Recommended / Review / Reject
+    """
+
+    strong_keywords = [
+        "good",
+        "strong",
+        "recommended",
+        "proceed",
+        "good investment",
+        "strong investment",
+    ]
+
+    weak_keywords = [
+        "bad",
+        "weak",
+        "reject",
+        "do not proceed",
+        "bad investment",
+        "weak investment",
+    ]
+
+    strong_idx = _find_first_matching_index(class_names, strong_keywords)
+    weak_idx = _find_first_matching_index(class_names, weak_keywords)
+
+    return strong_idx, weak_idx
 
 
 def apply_threshold_policy(prob_array, class_names, strong_threshold=0.50, weak_threshold=0.50):
-    strong_idx = _find_class_index(class_names, "good")
-    weak_idx = _find_class_index(class_names, "bad")
+    strong_idx, weak_idx = _resolve_threshold_indices(class_names)
 
     predictions = []
     for row in prob_array:
-        if row[strong_idx] >= strong_threshold:
+        if strong_idx is not None and row[strong_idx] >= strong_threshold:
             predictions.append(strong_idx)
-        elif row[weak_idx] >= weak_threshold:
+        elif weak_idx is not None and row[weak_idx] >= weak_threshold:
             predictions.append(weak_idx)
         else:
             predictions.append(int(np.argmax(row)))
+
     return np.array(predictions)
 
 
