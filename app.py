@@ -29,11 +29,11 @@ def get_runtime():
 
 
 def _fmt_money(value):
-    return f"R {value:,.0f}"
+    return f"R {float(value):,.0f}"
 
 
 def _fmt_pct(value):
-    return f"{value:,.2f}%"
+    return f"{float(value):,.2f}%"
 
 
 def _render_artifact_warning():
@@ -180,10 +180,34 @@ def _single_property_form():
     }
 
 
-def _render_amortization_chart(schedule: pd.DataFrame):
+def _normalize_result_fields(result: dict) -> dict:
+    if "estimated_rent" not in result and "monthly_rent" in result:
+        result["estimated_rent"] = result["monthly_rent"]
+
+    if "gross_yield_pct" not in result and "gross_yield" in result:
+        result["gross_yield_pct"] = float(result["gross_yield"]) * 100
+
+    if "net_yield_pct" not in result and "net_yield" in result:
+        result["net_yield_pct"] = float(result["net_yield"]) * 100
+
+    if "roi_pct" not in result and "roi" in result:
+        result["roi_pct"] = float(result["roi"]) * 100
+
+    return result
+
+
+def _confidence_display(result: dict) -> str:
+    confidence_value = float(result.get("top_probability_pct", 0))
+    if confidence_value <= 1:
+        confidence_value *= 100
+    return _fmt_pct(confidence_value)
+
+
+def _render_amortization_table(schedule: pd.DataFrame):
     st.markdown("**Projection snapshot**")
     projection_cols = ["year", "property_value", "loan_balance", "equity"]
     available_cols = [c for c in projection_cols if c in schedule.columns]
+
     if available_cols:
         display_df = schedule[available_cols].copy()
         for col in ["property_value", "loan_balance", "equity"]:
@@ -220,21 +244,31 @@ def main():
         if score_clicked:
             property_df = build_single_property_features(user_input, runtime["feature_names"])
             scored = score_properties(property_df, runtime)
-            result = scored.iloc[0].to_dict()
+
+            full_result_df = pd.concat(
+                [
+                    property_df.reset_index(drop=True),
+                    scored.reset_index(drop=True),
+                ],
+                axis=1,
+            )
+
+            result = full_result_df.iloc[0].to_dict()
+            result = _normalize_result_fields(result)
 
             flag_pack = generate_flags(result)
 
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Recommended label", str(result["recommended_label"]).title())
-            c2.metric("Confidence", _fmt_pct(float(result["top_probability_pct"])))
+            c1.metric("Recommended label", str(result.get("recommended_label", "unknown")).title())
+            c2.metric("Confidence", _confidence_display(result))
             c3.metric("Monthly cash flow", _fmt_money(float(result.get("monthly_cash_flow", 0))))
             c4.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
 
             st.subheader("Probability breakdown")
-            prob_cols = [c for c in scored.columns if c.startswith("prob_")]
+            prob_cols = [c for c in full_result_df.columns if c.startswith("prob_")]
             if prob_cols:
                 prob_display = (
-                    scored[prob_cols]
+                    full_result_df[prob_cols]
                     .rename(columns=lambda x: x.replace("prob_", "").title())
                     .T
                     .reset_index()
@@ -259,7 +293,7 @@ def main():
                 st.write("No major red flags identified from the current inputs.")
 
             st.subheader("Model-ready preview")
-            st.dataframe(scored, use_container_width=True)
+            st.dataframe(full_result_df, use_container_width=True)
 
             st.session_state["latest_result"] = result
             st.session_state["latest_input"] = user_input
@@ -325,7 +359,7 @@ def main():
             c2.metric("Property value at term", _fmt_money(summary["ending_property_value"]))
             c3.metric("Cash-flow break-even year", summary["break_even_year_display"])
 
-            _render_amortization_chart(schedule)
+            _render_amortization_table(schedule)
 
             st.markdown("**Full amortization schedule**")
             schedule_display = schedule.copy()
