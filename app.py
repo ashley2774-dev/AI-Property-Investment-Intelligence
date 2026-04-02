@@ -1,110 +1,449 @@
-from __future__ import annotations
+from pathlib import Path
 
-import numpy as np
 import pandas as pd
+import streamlit as st
+
+from src.inference.amortization import build_amortization_schedule, summarize_amortization
+from src.inference.features import build_single_property_features, coerce_batch_input
+from src.inference.model import load_runtime_artifacts, check_required_artifacts
+from src.inference.predict import score_properties
+from src.inference.rules import generate_flags
+
+st.set_page_config(
+    page_title="AI Property Investment Intelligence",
+    page_icon="🏠",
+    layout="wide",
+)
 
 
-def _normalize_label(value: str) -> str:
-    return str(value).strip().lower().replace("_", " ").replace("-", " ")
+@st.cache_resource(show_spinner=False)
+def get_runtime():
+    return load_runtime_artifacts(base_dir=Path("."))
 
 
-def _find_first_matching_index(classes, keywords):
-    normalized = [_normalize_label(c) for c in classes]
-
-    for keyword in keywords:
-        keyword_norm = _normalize_label(keyword)
-        for idx, cls in enumerate(normalized):
-            if cls == keyword_norm:
-                return idx
-
-    for keyword in keywords:
-        keyword_norm = _normalize_label(keyword)
-        for idx, cls in enumerate(normalized):
-            if keyword_norm in cls:
-                return idx
-
-    return None
+def _fmt_money(value):
+    return f"R {float(value):,.0f}"
 
 
-def _resolve_threshold_indices(class_names):
-    """
-    Try to map the model's class labels to:
-    - strong / best class
-    - weak / worst class
-
-    Supports labels like:
-    - Good / Moderate / Bad
-    - Strong Investment / Average Investment / Weak Investment
-    - Recommended / Review / Reject
-    """
-
-    strong_keywords = [
-        "good",
-        "strong",
-        "recommended",
-        "proceed",
-        "good investment",
-        "strong investment",
-    ]
-
-    weak_keywords = [
-        "bad",
-        "weak",
-        "reject",
-        "do not proceed",
-        "bad investment",
-        "weak investment",
-    ]
-
-    strong_idx = _find_first_matching_index(class_names, strong_keywords)
-    weak_idx = _find_first_matching_index(class_names, weak_keywords)
-
-    return strong_idx, weak_idx
+def _fmt_pct(value):
+    return f"{float(value):,.2f}%"
 
 
-def apply_threshold_policy(prob_array, class_names, strong_threshold=0.50, weak_threshold=0.50):
-    strong_idx, weak_idx = _resolve_threshold_indices(class_names)
-
-    predictions = []
-    for row in prob_array:
-        if strong_idx is not None and row[strong_idx] >= strong_threshold:
-            predictions.append(strong_idx)
-        elif weak_idx is not None and row[weak_idx] >= weak_threshold:
-            predictions.append(weak_idx)
-        else:
-            predictions.append(int(np.argmax(row)))
-
-    return np.array(predictions)
+def _render_artifact_warning():
+    missing = check_required_artifacts(Path("."))
+    if missing:
+        st.error(
+            "The deployed app is missing one or more model artifacts. "
+            "Upload the exported notebook outputs listed below into the repo root so Streamlit can load the real model."
+        )
+        st.code("\n".join(missing))
+        st.stop()
 
 
-def score_properties(model_df: pd.DataFrame, business_df: pd.DataFrame, runtime: dict) -> pd.DataFrame:
-    model = runtime["model"]
-    label_encoder = runtime["label_encoder"]
-    threshold_config = runtime["threshold_config"]
-    class_names = [str(c) for c in label_encoder.classes_]
+def _single_property_form():
+    st.subheader("Single property screening")
 
-    pred_default = model.predict(model_df)
-    prob_array = model.predict_proba(model_df)
+    col1, col2, col3 = st.columns(3)
 
-    pred_threshold = apply_threshold_policy(
-        prob_array,
-        class_names=class_names,
-        strong_threshold=float(threshold_config.get("strong_threshold", 0.5)),
-        weak_threshold=float(threshold_config.get("weak_threshold", 0.5)),
+    with col1:
+        province = st.text_input("Province", value="Gauteng")
+        city = st.text_input("City", value="Johannesburg")
+        suburb = st.text_input("Suburb", value="Bryanston")
+        property_type = st.selectbox(
+            "Property type",
+            ["Apartment", "House", "Townhouse", "Cluster", "Duplex", "Studio"],
+            index=0,
+        )
+        purchase_price = st.number_input(
+            "Purchase price (R)",
+            min_value=100000.0,
+            value=950000.0,
+            step=10000.0,
+        )
+        estimated_rent = st.number_input(
+            "Estimated monthly rent (R)",
+            min_value=1000.0,
+            value=8500.0,
+            step=250.0,
+        )
+        floor_area_sqm = st.number_input(
+            "Floor area (sqm)",
+            min_value=15.0,
+            value=65.0,
+            step=1.0,
+        )
+
+    with col2:
+        bedrooms = st.number_input("Bedrooms", min_value=0, value=2, step=1)
+        bathrooms = st.number_input("Bathrooms", min_value=0.0, value=1.0, step=0.5)
+        parking = st.number_input("Parking / garage spaces", min_value=0, value=1, step=1)
+        levy = st.number_input("Monthly levy (R)", min_value=0.0, value=1200.0, step=100.0)
+        rates_taxes = st.number_input(
+            "Monthly rates & taxes (R)",
+            min_value=0.0,
+            value=700.0,
+            step=50.0,
+        )
+        insurance = st.number_input(
+            "Monthly insurance (R)",
+            min_value=0.0,
+            value=350.0,
+            step=50.0,
+        )
+        other_opex = st.number_input(
+            "Other monthly opex (R)",
+            min_value=0.0,
+            value=250.0,
+            step=50.0,
+        )
+
+    with col3:
+        deposit_pct = st.slider(
+            "Deposit (%)",
+            min_value=0.0,
+            max_value=50.0,
+            value=10.0,
+            step=1.0,
+        )
+        interest_rate_pct = st.slider(
+            "Interest rate (%)",
+            min_value=5.0,
+            max_value=18.0,
+            value=11.75,
+            step=0.25,
+        )
+        loan_term_years = st.slider(
+            "Loan term (years)",
+            min_value=5,
+            max_value=30,
+            value=20,
+            step=1,
+        )
+        vacancy_pct = st.slider(
+            "Vacancy allowance (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=5.0,
+            step=0.5,
+        )
+        management_fee_pct = st.slider(
+            "Management fee (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=8.0,
+            step=0.5,
+        )
+        maintenance_pct = st.slider(
+            "Maintenance allowance (%)",
+            min_value=0.0,
+            max_value=15.0,
+            value=5.0,
+            step=0.5,
+        )
+        annual_growth_pct = st.slider(
+            "Annual property growth (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=6.0,
+            step=0.5,
+        )
+
+    return {
+        "province": province,
+        "city": city,
+        "suburb": suburb,
+        "property_type": property_type,
+        "purchase_price": purchase_price,
+        "estimated_rent": estimated_rent,
+        "floor_area_sqm": floor_area_sqm,
+        "bedrooms": bedrooms,
+        "bathrooms": bathrooms,
+        "parking": parking,
+        "levy": levy,
+        "rates_taxes": rates_taxes,
+        "insurance": insurance,
+        "other_opex": other_opex,
+        "deposit_pct": deposit_pct,
+        "interest_rate_pct": interest_rate_pct,
+        "loan_term_years": loan_term_years,
+        "vacancy_pct": vacancy_pct,
+        "management_fee_pct": management_fee_pct,
+        "maintenance_pct": maintenance_pct,
+        "annual_growth_pct": annual_growth_pct,
+        "rent_estimation_source": "user_input",
+    }
+
+
+def _confidence_display(result: dict) -> str:
+    return _fmt_pct(result.get("top_probability_pct", 0))
+
+
+def _render_amortization_table(schedule: pd.DataFrame):
+    st.markdown("**Projection snapshot**")
+    projection_cols = ["year", "property_value", "loan_balance", "equity"]
+    available_cols = [c for c in projection_cols if c in schedule.columns]
+
+    if available_cols:
+        display_df = schedule[available_cols].copy()
+        for col in ["property_value", "loan_balance", "equity"]:
+            if col in display_df.columns:
+                display_df[col] = display_df[col].astype(float).map(_fmt_money)
+        st.dataframe(display_df.astype(str), use_container_width=True, hide_index=True)
+    else:
+        st.dataframe(schedule.astype(str), use_container_width=True, hide_index=True)
+
+
+def _build_probability_table(scored: pd.DataFrame) -> pd.DataFrame:
+    prob_cols = [c for c in scored.columns if c.startswith("prob_")]
+    if not prob_cols:
+        return pd.DataFrame()
+
+    prob_display = (
+        scored[prob_cols]
+        .rename(columns=lambda x: x.replace("prob_", "").title())
+        .T
+        .reset_index()
+        .rename(columns={"index": "Class", 0: "Probability (%)"})
+    )
+    prob_display["Probability (%)"] = prob_display["Probability (%)"].astype(float).round(2)
+    prob_display = prob_display.sort_values("Probability (%)", ascending=False).reset_index(drop=True)
+    prob_display["Probability (%)"] = prob_display["Probability (%)"].map(lambda x: f"{x:.2f}%")
+    return prob_display
+
+
+def _financial_recommendation(result: dict) -> str:
+    cash_flow = float(result.get("monthly_cash_flow", 0))
+    dscr = float(result.get("dscr", 0))
+    roi_pct = float(result.get("roi_pct", 0))
+
+    if cash_flow > 1000 and dscr >= 1.2 and roi_pct >= 8:
+        return "Good"
+    elif cash_flow >= 0 and dscr >= 1.0:
+        return "Moderate"
+    return "Bad"
+
+
+def main():
+    st.title("🏠 AI Property Investment Intelligence")
+    st.caption("Real-model Streamlit deployment for financed buy-to-let screening")
+
+    st.sidebar.header("About")
+    st.sidebar.write(
+        "This app screens South African buy-to-let properties using the exported trained pipeline, "
+        "threshold policy, and notebook artifacts from your modelling workflow."
+    )
+    st.sidebar.info(
+        "Upload the model artifacts into the repo root under /models and optional reports under /reports. "
+        "The app will then score deals with the real pipeline instead of the earlier rule-based stand-in."
     )
 
-    deployed_policy = str(threshold_config.get("deployed_prediction_policy", "threshold_tuned"))
-    recommended = pred_threshold if deployed_policy == "threshold_tuned" else pred_default
+    _render_artifact_warning()
+    runtime = get_runtime()
 
-    results = business_df.reset_index(drop=True).copy()
+    tabs = st.tabs(
+        ["Summary", "Financials", "Amortization & equity", "Batch scoring", "Artifacts"]
+    )
 
-    for class_name, class_probs in zip(class_names, prob_array.T):
-        results[f"prob_{class_name}"] = class_probs * 100.0
+    with tabs[0]:
+        user_input = _single_property_form()
+        score_clicked = st.button("Screen property", type="primary")
 
-    results["predicted_label_default"] = label_encoder.inverse_transform(pred_default)
-    results["predicted_label_threshold"] = label_encoder.inverse_transform(pred_threshold)
-    results["recommended_label"] = label_encoder.inverse_transform(recommended)
-    results["deployed_prediction_policy"] = deployed_policy
-    results["top_probability_pct"] = prob_array.max(axis=1) * 100.0
+        if score_clicked:
+            business_df, model_df = build_single_property_features(
+                user_input,
+                runtime["feature_names"],
+            )
+            scored = score_properties(model_df, business_df, runtime)
+            result = scored.iloc[0].to_dict()
 
-    return results
+            financial_label = _financial_recommendation(result)
+            result["financial_recommendation"] = financial_label
+
+            flag_pack = generate_flags(result)
+
+            c1, c2, c3, c4, c5 = st.columns(5)
+            c1.metric("Investor recommendation", financial_label)
+            c2.metric("Model default label", str(result.get("predicted_label_default", "unknown")).title())
+            c3.metric("Threshold label", str(result.get("predicted_label_threshold", "unknown")).title())
+            c4.metric("Confidence", _confidence_display(result))
+            c5.metric("Monthly cash flow", _fmt_money(result.get("monthly_cash_flow", 0)))
+
+            c6, c7 = st.columns(2)
+            c6.metric("Recommended label", str(result.get("recommended_label", "unknown")).title())
+            c7.metric("DSCR", f"{float(result.get('dscr', 0)):.2f}")
+
+            st.subheader("Probability breakdown")
+            prob_display = _build_probability_table(scored)
+            if not prob_display.empty:
+                st.dataframe(prob_display.astype(str), use_container_width=True, hide_index=True)
+
+            st.subheader("Green flags")
+            if flag_pack.get("green_flags"):
+                for item in flag_pack["green_flags"]:
+                    st.success(item)
+            else:
+                st.write("No strong green flags identified from the current inputs.")
+
+            st.subheader("Red flags")
+            if flag_pack.get("red_flags"):
+                for item in flag_pack["red_flags"]:
+                    st.error(item)
+            else:
+                st.write("No major red flags identified from the current inputs.")
+
+            st.subheader("Model-ready preview")
+            st.dataframe(scored.astype(str), use_container_width=True)
+
+            st.session_state["latest_result"] = result
+            st.session_state["latest_input"] = user_input
+            st.session_state["latest_scored"] = scored
+            st.session_state["latest_model_df"] = model_df
+
+    with tabs[1]:
+        st.subheader("Financials")
+        if "latest_result" not in st.session_state:
+            st.info("Screen a property in the Summary tab to populate the financial breakdown.")
+        else:
+            result = st.session_state["latest_result"]
+
+            financial_rows = [
+                ("Purchase price", result.get("purchase_price", 0)),
+                ("Estimated rent", result.get("estimated_rent", 0)),
+                ("Deposit amount", result.get("deposit_amount", 0)),
+                ("Loan amount", result.get("loan_amount", 0)),
+                ("Monthly bond payment", result.get("monthly_bond_payment", 0)),
+                ("Monthly vacancy allowance", result.get("monthly_vacancy_cost", 0)),
+                ("Monthly management fee", result.get("monthly_management_fee", 0)),
+                ("Monthly maintenance", result.get("monthly_maintenance_cost", 0)),
+                ("Monthly total opex", result.get("monthly_total_opex", 0)),
+                ("Monthly NOI", result.get("monthly_noi", 0)),
+                ("Monthly cash flow", result.get("monthly_cash_flow", 0)),
+            ]
+            financial_df = pd.DataFrame(financial_rows, columns=["Metric", "Value"])
+            financial_df["Value"] = financial_df["Value"].astype(float).map(_fmt_money)
+            st.dataframe(financial_df.astype(str), use_container_width=True, hide_index=True)
+
+            ratio_rows = [
+                ("Gross yield (%)", result.get("gross_yield_pct", 0)),
+                ("Net yield (%)", result.get("net_yield_pct", 0)),
+                ("ROI (%)", result.get("roi_pct", 0)),
+                ("DSCR", result.get("dscr", 0)),
+                ("Bond-to-rent", result.get("bond_to_rent", 0)),
+                ("Opex-to-rent", result.get("opex_to_rent", 0)),
+                ("LTV", result.get("ltv", 0)),
+                ("Deposit-to-price", result.get("deposit_to_price", 0)),
+            ]
+            ratio_df = pd.DataFrame(ratio_rows, columns=["Ratio", "Value"])
+            ratio_df["Value"] = ratio_df.apply(
+                lambda r: _fmt_pct(float(r["Value"]))
+                if "%" in r["Ratio"]
+                else f"{float(r['Value']):,.2f}",
+                axis=1,
+            )
+            st.dataframe(ratio_df.astype(str), use_container_width=True, hide_index=True)
+
+    with tabs[2]:
+        st.subheader("Amortization & equity")
+        if "latest_input" not in st.session_state:
+            st.info("Screen a property first to build the amortization projection.")
+        else:
+            latest_input = st.session_state["latest_input"]
+            latest_result = st.session_state["latest_result"]
+
+            schedule = build_amortization_schedule(
+                purchase_price=float(latest_result.get("purchase_price", 0)),
+                loan_amount=float(latest_result.get("loan_amount", 0)),
+                annual_interest_rate=float(latest_input["interest_rate_pct"]) / 100.0,
+                loan_term_years=int(latest_input["loan_term_years"]),
+                monthly_cash_flow=float(latest_result.get("monthly_cash_flow", 0)),
+                annual_growth_rate=float(latest_input["annual_growth_pct"]) / 100.0,
+            )
+            summary = summarize_amortization(schedule)
+
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Equity after full term", _fmt_money(summary["ending_equity"]))
+            c2.metric("Property value at term", _fmt_money(summary["ending_property_value"]))
+            c3.metric("Cash-flow break-even year", summary["break_even_year_display"])
+
+            _render_amortization_table(schedule)
+
+            st.markdown("**Full amortization schedule**")
+            schedule_display = schedule.copy()
+            for col in ["property_value", "loan_balance", "equity"]:
+                if col in schedule_display.columns:
+                    schedule_display[col] = schedule_display[col].astype(float).map(_fmt_money)
+            st.dataframe(schedule_display.astype(str), use_container_width=True, hide_index=True)
+
+    with tabs[3]:
+        st.subheader("Batch scoring")
+        st.write(
+            "Upload a CSV using the provided template. The app will calculate financial features, "
+            "align the frame to the training feature list, and score each property with the real model."
+        )
+
+        template_path = Path("sample_batch_input.csv")
+        if template_path.exists():
+            with open(template_path, "rb") as f:
+                st.download_button(
+                    "Download CSV template",
+                    data=f.read(),
+                    file_name="sample_batch_input.csv",
+                    mime="text/csv",
+                )
+
+        uploaded = st.file_uploader("Upload property CSV", type=["csv"])
+        if uploaded is not None:
+            batch_df = pd.read_csv(uploaded)
+            business_batch_df, model_batch_df = coerce_batch_input(
+                batch_df,
+                runtime["feature_names"],
+            )
+            scored_batch = score_properties(model_batch_df, business_batch_df, runtime)
+            st.dataframe(scored_batch.astype(str), use_container_width=True)
+            st.download_button(
+                "Download scored results",
+                data=scored_batch.to_csv(index=False).encode("utf-8"),
+                file_name="investment_scored_results.csv",
+                mime="text/csv",
+            )
+
+    with tabs[4]:
+        st.subheader("Loaded artifacts")
+        manifest = {
+            "model_path": str(runtime["paths"]["model"]),
+            "feature_list_path": str(runtime["paths"]["features"]),
+            "label_encoder_path": str(runtime["paths"]["label_encoder"]),
+            "threshold_config_path": str(runtime["paths"]["threshold_config"]),
+        }
+        st.json(manifest)
+
+        st.markdown("**Live inference diagnostics**")
+        st.write("Model classes:", list(runtime["label_encoder"].classes_))
+
+        if "latest_model_df" in st.session_state:
+            latest_model_df = st.session_state["latest_model_df"]
+            st.write("Model input shape:", latest_model_df.shape)
+            st.write("Model input non-null count:", int(latest_model_df.notna().sum(axis=1).iloc[0]))
+            non_null_cols = latest_model_df.columns[latest_model_df.notna().iloc[0]].tolist()
+            st.write("First 30 non-null columns:", non_null_cols[:30])
+
+        if "latest_scored" in st.session_state:
+            latest_scored = st.session_state["latest_scored"]
+            prob_cols = [c for c in latest_scored.columns if c.startswith("prob_")]
+            if prob_cols:
+                st.markdown("**Raw model probabilities**")
+                st.dataframe(latest_scored[prob_cols].astype(str), use_container_width=True)
+
+        optional_reports = [
+            Path("reports/metrics/final_model_metrics_summary.csv"),
+            Path("reports/features/final_model_feature_importance.csv"),
+            Path("reports/explainability/shap_global_importance.csv"),
+        ]
+        for report_path in optional_reports:
+            if report_path.exists():
+                st.write(f"Preview: {report_path}")
+                st.dataframe(pd.read_csv(report_path).head(20).astype(str), use_container_width=True)
+
+
+if __name__ == "__main__":
+    main()
