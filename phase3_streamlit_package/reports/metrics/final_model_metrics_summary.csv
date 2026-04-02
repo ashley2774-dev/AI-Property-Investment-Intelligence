@@ -1,3 +1,0 @@
-prediction_policy,test_accuracy,test_macro_f1
-default_argmax,1.0,1.0
-threshold_tuned,1.0,1.0

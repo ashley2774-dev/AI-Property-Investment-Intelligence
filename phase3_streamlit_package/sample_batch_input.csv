@@ -1,4 +1,0 @@
-province,city,suburb,property_type,purchase_price,estimated_rent,floor_area_sqm,bedrooms,bathrooms,parking,levy,rates_taxes,insurance,other_opex,deposit_pct,interest_rate_pct,loan_term_years,vacancy_pct,management_fee_pct,maintenance_pct,annual_growth_pct
-Gauteng,Johannesburg,Bryanston,Apartment,950000,8500,65,2,1,1,1200,700,350,250,10,11.75,20,5,8,5,6
-Western Cape,Cape Town,Parklands,Apartment,1250000,9800,58,2,1,1,1500,850,380,300,15,11.25,20,4,8,5,6
-KwaZulu-Natal,Durban,Umhlanga,Apartment,2100000,14500,82,2,2,2,2200,1200,550,350,20,11.5,20,4,8,5,6

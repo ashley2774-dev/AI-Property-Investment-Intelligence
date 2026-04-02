@@ -1,3 +1,0 @@
-model,best_cv_macro_f1,val_accuracy,val_macro_f1,best_params
-RandomForest,0.9979642822689812,1.0,1.0,"{'classifier__n_estimators': 500, 'classifier__min_samples_split': 20, 'classifier__min_samples_leaf': 2, 'classifier__max_features': None, 'classifier__max_depth': 8}"
-ExtraTrees,0.9939348975723794,0.9977810650887574,0.99237895341337,"{'classifier__n_estimators': 700, 'classifier__min_samples_split': 10, 'classifier__min_samples_leaf': 2, 'classifier__max_features': None, 'classifier__max_depth': 24}"
