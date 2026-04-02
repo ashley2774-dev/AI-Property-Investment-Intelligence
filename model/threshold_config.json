@@ -1,0 +1,7 @@
+{
+  "model_name": "RandomForest",
+  "strong_threshold": 0.35,
+  "weak_threshold": 0.35,
+  "validation_macro_f1_default": 1.0,
+  "validation_macro_f1_threshold_tuned": 1.0
+}
