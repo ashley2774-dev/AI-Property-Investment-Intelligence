@@ -1,165 +1,193 @@
-# 💡 AI-Powered Property Investment Intelligence (South Africa)
+# 🏠 AI Property Investment Intelligence (South Africa)
 
-## 🚀 Investing in Property Should Be Data-Driven - But Today, It Isn’t
-
-For many first-time property investors in South Africa, entering the real estate market is not limited by capital - it is limited by access to reliable, structured, and actionable information.
-
-Despite the availability of property listing platforms, the process of identifying a *good investment* remains highly manual, fragmented, and inconsistent. Investors are required to piece together information from multiple sources, interpret it themselves, and make high-stakes financial decisions with limited analytical support.
-
-This creates a critical gap between **data availability** and **decision-making capability**.
+An end-to-end machine learning system that **screens residential property deals** and provides **investment recommendations based on financial viability**.
 
 ---
 
-## 💡 The Core Problem
+## 🚀 Problem
 
-At its core, property investment is a **data problem disguised as a search problem**.
+South African property investors manually evaluate deals by:
 
-While platforms make it easy to *find* properties, they do not help users *evaluate* them.
+* estimating rental income
+* calculating ROI, yield, and DSCR
+* assessing affordability and cash flow
+* comparing properties across suburbs
 
-To determine whether a property is a viable investment, an investor must:
+This process is:
 
-- estimate rental income based on comparable listings  
-- assess area-level demand and vacancy trends  
-- calculate financial metrics such as ROI, yield, and cash flow  
-- factor in costs, risks, and long-term appreciation potential  
-
-These steps are:
-- not standardised  
-- rarely automated  
-- heavily dependent on user experience  
-
-As a result, the burden of analysis is pushed entirely onto the investor.
+* time-consuming
+* inconsistent
+* difficult to scale
 
 ---
 
-## 🎯 Target User
+## 💡 Solution
 
-This product is designed for:
+This project builds a **data-driven screening engine** that:
 
-> **First-time and early-stage property investors in South Africa** who are actively searching for investment properties but lack the tools, frameworks, and experience to evaluate opportunities efficiently.
-
-These users are typically:
-- time-constrained professionals  
-- new entrants into the rental market  
-- individuals seeking passive income through property  
-
-They are motivated to invest but uncertain about *how to identify a good deal*.
+1. Processes property listing data
+2. Applies structured financial investment logic
+3. Engineers investment-focused features
+4. Uses machine learning to classify deal quality
+5. Outputs clear investor recommendations
 
 ---
 
-## ⚠️ Deep Dive: Key Pain Points
+## 🧠 Machine Learning Approach
 
-### 1. Discovery ≠ Decision
+### Problem Type
 
-Property platforms optimise for browsing and discovery, not investment evaluation.
+Multi-class classification:
 
-Users can easily filter by price, location, and property type but they are not provided with:
-- expected rental yield  
-- projected cash flow  
-- investment risk indicators  
-
-👉 The result: users find properties, but cannot confidently decide on them.
+* Weak Investment
+* Moderate Investment
+* Strong Investment
 
 ---
 
-### 2. Fragmented Data Ecosystem
+### Modelling Strategy (Aligned to Notebook)
 
-To evaluate a single property, users must manually combine data from:
+* Train / Validation / Test split
+* Pipeline-based preprocessing
+* Baseline model: Logistic Regression
+* Feature selection:
 
-- property listing websites  
-- rental listing platforms  
-- external sources for area insights  
-- personal spreadsheets for calculations  
-
-There is no unified view of:
-- property performance  
-- rental benchmarks  
-- area-level dynamics  
-
-👉 This leads to inefficiency and inconsistent analysis.
+  * Mutual Information
+  * ANOVA F-score
+* Final model: *(update with your best model)*
 
 ---
 
-### 3. No Standardised Investment Framework
+## 📊 Model Performance
 
-Each investor builds their own method (if any) to evaluate deals.
+*(Replace with your real values from notebook)*
 
-Some calculate yield.  
-Some estimate rent informally.  
-Many rely on intuition.
-
-There is no:
-- consistent scoring system  
-- benchmark for comparison  
-- structured decision framework  
-
-👉 This makes it difficult to compare opportunities objectively.
+| Metric                    | Score |
+| ------------------------- | ----- |
+| Accuracy                  | 0.97  |
+| Balanced Accuracy         | 0.XX  |
+| Strong Investment Recall  | 0.XX  |
+| Weak Investment Precision | 0.XX  |
 
 ---
 
-### 4. High Time Cost per Property
+### ⚠️ Important Interpretation
 
-A single property can take **1–3 hours** to properly analyse when considering:
-- rental comparisons  
-- cost estimation  
-- financial calculations  
+Due to class imbalance:
 
-This limits the ability to:
-- evaluate multiple opportunities  
-- act quickly in competitive markets  
+* High accuracy is driven by majority class (Weak investments)
+* True performance must be evaluated per class
 
-👉 Opportunity cost becomes a major barrier.
+👉 The model is designed as a **screening tool**, not a final decision-maker
 
 ---
 
-### 5. Decision-Making Under Uncertainty
+## 📈 Key Features Driving Predictions
 
-Without reliable data and structured analysis, investors face:
+From feature selection analysis:
 
-- overestimating rental income  
-- underestimating costs  
-- ignoring area-specific risks  
+Top drivers include:
 
-👉 This increases the likelihood of poor investment decisions and financial loss.
+* Debt service affordability (DSCR)
+* Cash flow strength
+* Rental yield
+* Cost burden ratios
+* Financing structure
 
----
-
-## 🧠 Problem Framing (Product Perspective)
-
-This is not just a data availability issue  it is a **decision intelligence problem**.
-
-> Users do not need more listings.  
-> They need **context, analysis, and recommendations**.
-
-The key challenge is:
-
-> **How might we transform raw property data into clear, actionable investment decisions at scale?**
+👉 This confirms the model aligns with **real-world investment logic**
 
 ---
 
-## 🚀 Solution Overview
+## 🏗️ System Architecture
 
-This project addresses the problem by building an **AI-powered property investment intelligence system** that shifts the user experience from:
-
-> *“searching for properties”* → *“identifying investment opportunities”*
-
-The system:
-
-- automates property and rental data collection  
-- enriches listings with area-level insights  
-- standardises financial analysis across all properties  
-- applies machine learning to evaluate investment potential  
-- ranks and classifies properties based on expected performance  
+```text
+Data → Cleaning → Financial Engine → Feature Engineering → Model → Decision Engine → App
+```
 
 ---
 
-## ⚡ Outcome
+## 🧪 Model Evaluation Approach
 
-Instead of manually analysing each property, users receive:
+The model is evaluated using:
 
-- pre-calculated investment metrics  
-- comparable rental benchmarks  
-- a clear investment score  
-- prioritised opportunities worth further investigation  
+* Confusion matrix
+* Class-level performance
+* Error analysis
+* Feature importance
+* Financial interpretation
 
-> 💡 The result is a shift from manual, intuition-based decision-making to **scalable, data-driven investment intelligence**.
+📄 See: `reports/model_evaluation_summary.md`
+
+---
+
+## 💼 Business Impact
+
+If applied to 1,000 properties:
+
+* ~60–70% filtered as weak investments
+* ~20–30% flagged for further review
+* ~10–15% identified as strong opportunities
+
+👉 Enables **fast, scalable deal screening**
+
+---
+
+## 🖥️ Streamlit App
+
+The app allows users to:
+
+* input property details
+* run full financial + ML evaluation
+* receive:
+
+  * investment classification
+  * financial breakdown
+  * investor recommendation
+
+---
+
+## ⚙️ How to Run
+
+```bash
+git clone https://github.com/your-username/AI-Property-Investment-Intelligence.git
+cd AI-Property-Investment-Intelligence
+pip install -r requirements.txt
+python src/run_pipeline.py
+streamlit run app/streamlit_app.py
+```
+
+---
+
+## ⚠️ Data Notes
+
+* Dataset reflects real market imbalance (mostly weak deals)
+* Synthetic expansion used only for demo scaling
+* Model trained on original data
+
+---
+
+## 🛠️ Tech Stack
+
+* Python
+* Pandas / NumPy
+* Scikit-learn
+* Streamlit
+* SHAP
+* Joblib
+
+---
+
+## 📌 Key Strength of This Project
+
+This project does not just predict outcomes — it:
+
+✔ embeds financial logic
+✔ reflects real investment decision-making
+✔ outputs actionable recommendations
+
+---
+
+## 👤 Author
+
+Ashley Mathabatha
+Data Scientist | Property Investment Intelligence
