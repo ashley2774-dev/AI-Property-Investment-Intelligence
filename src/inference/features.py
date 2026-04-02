@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Iterable
 
 import numpy as np
@@ -33,7 +32,6 @@ DEFAULTS = {
     "annual_growth_pct": 6.0,
 }
 
-
 ALIASES = {
     "garage": "parking",
     "garages": "parking",
@@ -58,24 +56,33 @@ def _normalize_payload(payload: dict) -> dict:
 
 def _inject_engineered_columns(df: pd.DataFrame) -> pd.DataFrame:
     output_rows = []
+
     for _, row in df.iterrows():
         payload = _normalize_payload(row.to_dict())
         finance = calculate_financials(payload)
+
         combined = payload.copy()
         combined.update(finance.__dict__)
 
-        combined["bedroom_density_floor"] = float(combined.get("bedrooms", 0)) / max(float(combined.get("floor_area_sqm", 1)), 1.0)
-        combined["bathroom_density_floor"] = float(combined.get("bathrooms", 0)) / max(float(combined.get("floor_area_sqm", 1)), 1.0)
-        combined["cash_flow_margin"] = finance.monthly_cash_flow / finance.estimated_rent if finance.estimated_rent else 0.0
+        floor_area = max(float(combined.get("floor_area_sqm", 1.0)), 1.0)
+        bedrooms = max(float(combined.get("bedrooms", 1.0)), 1.0)
+        bathrooms = max(float(combined.get("bathrooms", 1.0)), 1.0)
+        estimated_rent = float(finance.estimated_rent)
+        purchase_price = float(finance.purchase_price)
+
+        combined["bedroom_density_floor"] = float(combined.get("bedrooms", 0.0)) / floor_area
+        combined["bathroom_density_floor"] = float(combined.get("bathrooms", 0.0)) / floor_area
+        combined["cash_flow_margin"] = finance.monthly_cash_flow / estimated_rent if estimated_rent else 0.0
         combined["debt_service_headroom"] = finance.dscr - 1.0
-        combined["rates_to_rent"] = float(combined.get("rates_taxes", 0)) / finance.estimated_rent if finance.estimated_rent else 0.0
-        combined["levy_to_rent"] = float(combined.get("levy", 0)) / finance.estimated_rent if finance.estimated_rent else 0.0
-        combined["price_per_bedroom"] = finance.purchase_price / max(float(combined.get("bedrooms", 1)), 1.0)
-        combined["price_per_bathroom"] = finance.purchase_price / max(float(combined.get("bathrooms", 1)), 1.0)
-        combined["rent_per_bedroom"] = finance.estimated_rent / max(float(combined.get("bedrooms", 1)), 1.0)
-        combined["gross_rent_to_price"] = (finance.estimated_rent * 12.0) / finance.purchase_price if finance.purchase_price else 0.0
-        combined["occupancy_pct"] = 100.0 - float(payload.get("vacancy_pct", 0))
+        combined["rates_to_rent"] = float(combined.get("rates_taxes", 0.0)) / estimated_rent if estimated_rent else 0.0
+        combined["levy_to_rent"] = float(combined.get("levy", 0.0)) / estimated_rent if estimated_rent else 0.0
+        combined["price_per_bedroom"] = purchase_price / bedrooms if purchase_price else 0.0
+        combined["price_per_bathroom"] = purchase_price / bathrooms if purchase_price else 0.0
+        combined["rent_per_bedroom"] = estimated_rent / bedrooms if estimated_rent else 0.0
+        combined["gross_rent_to_price"] = (estimated_rent * 12.0) / purchase_price if purchase_price else 0.0
+        combined["occupancy_pct"] = 100.0 - float(payload.get("vacancy_pct", 0.0))
         combined["rent_estimation_source"] = combined.get("rent_estimation_source", "user_input")
+
         output_rows.append(combined)
 
     return pd.DataFrame(output_rows)
@@ -94,25 +101,44 @@ def _align_to_feature_list(df: pd.DataFrame, feature_names: Iterable[str]) -> pd
             else:
                 aligned[col] = np.nan
 
-    aligned = aligned[feature_names].copy()
-    return aligned
+    return aligned[feature_names].copy()
 
 
-def build_single_property_features(payload: dict, feature_names: Iterable[str]) -> pd.DataFrame:
+def build_single_property_features(
+    payload: dict, feature_names: Iterable[str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Returns:
+        business_df: engineered dataframe with financial outputs and business-facing columns
+        model_df: feature-aligned dataframe used strictly for model inference
+    """
     normalized = _normalize_payload(payload)
     raw_df = pd.DataFrame([normalized])
-    engineered = _inject_engineered_columns(raw_df)
-    return _align_to_feature_list(engineered, feature_names)
+
+    business_df = _inject_engineered_columns(raw_df)
+    model_df = _align_to_feature_list(business_df, feature_names)
+
+    return business_df, model_df
 
 
-def coerce_batch_input(batch_df: pd.DataFrame, feature_names: Iterable[str]) -> pd.DataFrame:
+def coerce_batch_input(
+    batch_df: pd.DataFrame, feature_names: Iterable[str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Returns:
+        business_df: engineered dataframe with financial outputs and business-facing columns
+        model_df: feature-aligned dataframe used strictly for model inference
+    """
     if batch_df.empty:
         raise ValueError("Uploaded CSV is empty.")
 
     renamed = batch_df.rename(columns={c: ALIASES.get(c, c) for c in batch_df.columns})
+
     for key, value in DEFAULTS.items():
         if key not in renamed.columns:
             renamed[key] = value
 
-    engineered = _inject_engineered_columns(renamed)
-    return _align_to_feature_list(engineered, feature_names)
+    business_df = _inject_engineered_columns(renamed)
+    model_df = _align_to_feature_list(business_df, feature_names)
+
+    return business_df, model_df
